@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>AirB&B Homepage</title>
+        <link rel="stylesheet" href="/static/style.css"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    </head>
+    <body>
+        <nav class="menu">
+            <a href="/login">Log In</a>   |   <a href="/userRegistration">Sign-up</a>
+        </nav>
+        <header class="header">
+            <a href="/">
+                <img alt="AirB&B" src="/static/images/logo.png" />
+              </a>
+        </header>
+
+        <div class="searchBar">
+            <div class="row">
+                <div class="col"><label for="searchLocation">WHERE</label></div>
+                <div class="col">
+                  <select id="searchLocation" class="form-control">
+                    <option selected>Anywhere...</option>
+                    <option value="1">Toronto</option>
+                    <option value="2">Halifax</option>
+                    <option value="3">Vancouver</option>
+                    <option value="4">Saskatoon</option>
+                  </select>
+                </div>
+                <div class="col"><label for="startDate">CHECK-IN</label></div>
+                <div class="col">
+                  <input type="date" class="form-control" id="startDate">
+                </div>
+                <div class="col"><label for="endDate">CHECKOUT</label></div>
+                <div class="col">
+                  <input type="date" class="form-control" id="endDate">
+                </div>
+                <div class="col"><label for="guestCount">GUESTS</label></div>
+                <div class="col">      
+                    <select id="guestCount" class="form-control">
+                      <option selected>Choose...</option>
+                      <option value="1">1 Guest</option>
+                      <option value="2">2 Guests</option>
+                      <option value="3">3 Guests</option>
+                    </select>
+                </div>
+                <div class="col">
+                  <a href="/searchResults"> <button type="submit" class="btn btn-primary mb-2">Submit</button></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="sectionBreak">
+        <div class="promo">
+            <p>$0 join fee, <img src="/static/images/confetti.png"/><br>reduced service fees<br>ONLY at AirB&B <br> 
+            <img src="/static/images/winner.png"/></p>
+        </div>
+        <div class="info">
+            <h2>Why We Are Better</h2>
+            <p>
+              Here at AirB&B we like to do things a little bit differently.<br><br>Instead of fancy experiences and extras, we like to focus on perfecting our core service - giving you a place that feels like home when you're not at home. Near or far, with us you can find the perfect place to live, work, and play. You can count on us for everything between breakfast & bed.<br><br>
+            </p>
+            <div class="row">
+                <img class="infopic" src="/static/images/info_pic6.jpg"/>
+                <iframe class="infopic" width="560" height="315" src="https://www.youtube.com/embed/L2q318dZKP0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+        </div>
+        <footer class="row">
+            <p>
+                2020 AirB&B<br />
+                Contact: <a href="mailto:bisbister@myseneca.ca"> bisbister@myseneca.ca</a>
+                </a>
+            </p>
+            <a href="https:www.instagram.com"><img src="/static/images/instagram.png" /></a>
+            <a href="https:www.facebook.com"> <img src="/static/images/facebook.png" /></a>
+            <a href="https:www.twitter.com"> <img src="/static/images/twitter.png" /></a>
+        </footer>
+    </body>
+</html>
