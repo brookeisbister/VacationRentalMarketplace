@@ -13,7 +13,7 @@ app.set('view engine', '.hbs');
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user:'seneca.brookeisbister@gmail.com',
+        user: 'seneca.brookeisbister@gmail.com',
         pass: '2020web322'
     }
 });
@@ -30,7 +30,7 @@ app.get("/", function (req, res) {
 });
 
 app.get("/searchResults", function (req, res) {
- var Listing = [
+    var Listing = [
         {
             pic: "listing1.jpg",
             type: "Single Room",
@@ -75,25 +75,25 @@ app.get("/searchResults", function (req, res) {
 });
 
 app.get("/userRegistration", function (req, res) {
-res.render('userRegistration', {
+    res.render('userRegistration', {
         layout: false
     });
 });
 
 app.get("/login", function (req, res) {
-res.render('login', {
+    res.render('login', {
         layout: false
     });
 });
 
 app.get("/confirmation", function (req, res) {
- res.render('confirmation', {
+    res.render('confirmation', {
         layout: false
     });
 });
 
 app.get("/details", function (req, res) {
- res.render('details', {
+    res.render('details', {
         layout: false
     });
 });
@@ -150,13 +150,13 @@ app.post("/register-for-process",
                                             from: 'seneca.brookeisbister@gmail.com',
                                             to: req.body.email,
                                             subject: 'Welcome to AirB&B',
-                                            html: '<p>Hello '+req.body.fname+' '+req.body.lname+',<br/><br/>Thank you for registering with us!<br/><br/><br/>Sincerely,<br/>Customer Support</p>'
+                                            html: '<p>Hello ' + req.body.fname + ' ' + req.body.lname + ',<br/><br/>Thank you for registering with us!<br/><br/><br/>Sincerely,<br/>Customer Support</p>'
                                         };
-                                        transporter.sendMail(emailOptions, (error,info)=>{
-                                            if(error){
-                                                console.log("ERROR: "+error)
-                                            }else{
-                                                console.log("Success: "+ info.response);
+                                        transporter.sendMail(emailOptions, (error, info) => {
+                                            if (error) {
+                                                console.log("ERROR: " + error)
+                                            } else {
+                                                console.log("Success: " + info.response);
                                             }
                                         })
                                     } else {

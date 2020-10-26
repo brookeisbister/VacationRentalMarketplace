@@ -14,7 +14,7 @@
   {{> nav}}
   {{> header}}
 
-    <div class="signup">
+  <div class="signup">
     <h2><img src="/static/images/winner.png" class="promo-icon" />New User</h2>
     <form class="col" action="/register-for-process" method="POST">
       <input type="text" name="fname" placeholder="First Name" />
@@ -27,8 +27,8 @@
         <input type="radio" id="userrenter" name="usertype" value="renter" />
         <label for="userrenter">Renter</label>
       </div>
-        <p class="errMsg">{{data.usertype}}</p>
-      <input type="email" name="email"placeholder="Email Address" />
+      <p class="errMsg">{{data.usertype}}</p>
+      <input type="email" name="email" placeholder="Email Address" />
       <p class="errMsg">{{data.email}}</p>
       <input type="password" name="pwd" placeholder="Create Password" />
       <p class="errMsg">{{data.pwd}}</p>
@@ -36,9 +36,10 @@
       <p class="errMsg">{{data.checkpwd}}</p>
       <button type="submit" class="btn btn-primary mb-2">Sign up</button><br>
     </form>
-    </div>  
+  </div>
 
 
   {{> footer}}
 </body>
+
 </html>
