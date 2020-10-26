@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AirB&B Register</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+  {{> nav}}
+  {{> header}}
+
+    <div class="signup">
+    <h2><img src="/static/images/winner.png" class="promo-icon" />New User</h2>
+    <form class="col" action="/register-for-process" method="POST">
+      <input type="text" name="fname" placeholder="First Name" />
+      <p class="errMsg">{{data.fname}}</p>
+      <input type="text" name="lname" placeholder="Last Name" />
+      <p class="errMsg">{{data.lname}}</p>
+      <div class="row">
+        <input type="radio" id="userowner" name="usertype" value="owner" />
+        <label for="userowner">Owner</label>
+        <input type="radio" id="userrenter" name="usertype" value="renter" />
+        <label for="userrenter">Renter</label>
+      </div>
+        <p class="errMsg">{{data.usertype}}</p>
+      <input type="email" name="email"placeholder="Email Address" />
+      <p class="errMsg">{{data.email}}</p>
+      <input type="password" name="pwd" placeholder="Create Password" />
+      <p class="errMsg">{{data.pwd}}</p>
+      <input type="password" name="checkpwd" placeholder="Confirm Password" />
+      <p class="errMsg">{{data.checkpwd}}</p>
+      <button type="submit" class="btn btn-primary mb-2">Sign up</button><br>
+    </form>
+    </div>  
+
+
+  {{> footer}}
+</body>
+</html>

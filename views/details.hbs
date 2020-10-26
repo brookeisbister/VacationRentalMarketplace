@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AirB&B Listing Details</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+    {{> nav}}
+    {{> header}}
+    <div class="details">
+    <h2>Pancakes or Eggs?</h2>
+    <div class="card">
+        <div class="row">
+            <p class="col">Vancouver, BC, Canada</p>
+            <button type="button" class="btn btn-primary mb-2">Add to Favourites</button>
+            <button type="button" class="btn btn-primary mb-2">SHARE</button>
+        </div>
+    </div>
+        <div class="previewpics">
+            <div class="row">
+                <div class="col">
+                    <img src="/static/images/listing3bed.jpg" />
+                </div>
+                <div class="col">
+                    <img src="/static/images/listing3.jpg" />
+                    <img src="/static/images/listing3bathroom.jpg" />
+                </div>
+                <div class="col">
+                    <img src="/static/images/listing3kitchen.jpg" />
+                    <img src="/static/images/listing3terrace.jpg" />
+                </div>
+            </div>
+        </div>
+
+        <div class="promo">
+            <div class="row">
+                <div class="col label"><label for="startDate">CHECK-IN</label></div>
+                <div class="col option">
+                    <input type="date" class="form-control" id="startDate">
+                </div>
+                <div class="col label"><label for="endDate">CHECKOUT</label></div>
+                <div class="col option">
+                    <input type="date" class="form-control" id="endDate">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col"> </div><div class="col"> </div>
+                <div class="col"> </div><div class="col"> </div>
+                <div class="col"> <a href="/confirmation"> <button type="submit" class="btn btn-primary mb-2">BOOK NOW</button></a></div>
+            </div>
+        </div>
+            <h3>Entire Home hosted by Brooke</h3>
+            <div class="card">
+                <p>2 guests | 1 bedroom | 1 bed | 1 bath</p>
+            </div>
+            <div class="card">
+                <h4>About the Place</h4>
+                <p>Newly renovated, 1-bedroom apartment in the heart of downtown Vancouver. </p>
+                <p>Enjoy a chef-level kitchen with all the equipment and appliances you need. Includes a private livingroom, bathroom and bedroom. Close to many shops, cafes and public transit stops.</p>
+            </div>
+            <div class="card">
+                <h4>Amenities</h4>
+                <ul>
+                    <li>Wifi</li>
+                    <li>Kitchen</li>
+                    <li>Essentials</li>
+                    <li>Balcony</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Cancellation Policy</h4>
+                <p>We're ready when you are. Cancel or change your booking up to 24 hours before your expected arrival. We're doing everything we can do to deliver a safe, easy and convenient stay. <br>To make space for a smooth experience, cancellations within 24 hours of check-in will be billed only the service and cleaning fee. Caring for our guests and renters is our top priority.</p>
+            </div>
+            <div class="card"></div>
+    </div>
+
+
+
+    {{> footer}}
+</body>
+
+</html>

@@ -1,4 +1,6 @@
 /* logo from freelogodesign.org */
+/* images from pexels.com */
+/* icons from icon8.com */
 /*
 colour family
 green e0ece4
@@ -14,52 +16,43 @@ body {
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   color: #797a7e;
 }
-.sectionBreak{
-  border: 15px solid #f7f2e7;
-  padding: 20px;
-  margin: 20px;
+body a{
+  text-decoration: none;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  color: #797a7e;
+}
+body p{
+  margin: 0;
+  font-size: 16px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  color: #797a7e;
 }
 
 /* header section */
 .header{
   background-color: #797a7e;
-  border-radius: 5px;
 }
-.menu a{
-  text-decoration: none;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  color: #797a7e;
-}
-.menu{
-  border-radius: 5px;
+nav{
   background-color: #e0ece4;
   padding: 1em;
   text-align: end;
 }
+
 /* footer section */
 footer{
   width:100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  padding:1em;
+  position: relative;
+  left: 0;
+  bottom: 0;
 }
- footer p{
-  padding-left: 2em;
-  text-decoration: none;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  color: #797a7e;
-  flex-grow: 4;
-}
-footer a{
-  text-decoration: none;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  color: #797a7e;
+footer .row .col{
+  min-width: 300px;
 }
 
 /* home info */
 .info{
-  width: 95%;
-  border-radius: 5px;
+  width: 100%;
   background-color: rgb(207,232,220);
   padding: 1em;
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -68,63 +61,73 @@ footer a{
 img.infopic{
   width: auto;
   max-height: 315px;
-  border: solid white;
-  padding: 10px;
-  margin-left: 1em;;
-}
-iframe.infopic{
-  border: solid white;
-  padding: 10px;
-  margin-left: 1em;
+  max-width: 100%;
+  padding-bottom: 1em;
 }
 .info .row{
   justify-content: space-evenly;
 }
 /* home promo */
 .promo{
-  float: right;
   background-color: #f9c0c0;
   font-weight: bold;
-  font-size: 1.3em;
-  color: #ffffff;
   padding: 1em;
-  border-radius: 5px;
+}
+.promo table{
+width:100%;
+}
+ .promo-icon{
+height: 50px;
+width: 50px;
+margin-right: .5em;
 }
 /* search bar */
-.searchBar{
-  padding: 1em 3em 0 3em;
-}
 button.btn.btn-primary.mb-2{
   color: #797a7e;
   background-color: #f6f6f6;
   border: #797a7e;
-  margin: 0px 15px 0px 15px;
+  margin: .5rem;
 }
-.searchBar .row .col{
+.searchBar .row{
+  max-width: 350px;
+  margin:auto;
+  padding-top:1.5em;
+}
+.col.label{
   padding:0;
-  text-align: center;
+  text-align: right;
+  margin-right: 1em;
+  min-width: 80px;
+}
+.col.option{
+  padding:0;
+  margin-right: 1em;
+  min-width: 200px;
+  max-width: 215px;
 }
 /* search results */
 .listing{
 display: flex;
 flex-direction: column;
 border: solid #797a7e;
-padding: 10px;
-padding-bottom: 20px;
-contain: content;
+padding: 1em;
+margin:.5em;
+min-width: 150px;
 max-width:30%;
+}
+.listing p{
+  font-size: .75rem;
 }
 .listing img{
   width:100%;
   height: auto;
 }
-.searchResults{
+.row.searchResults{
+  width:100%;
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
   justify-content: space-evenly;
-  margin-top: 1em;
-  contain: content;
+  margin: auto;
 }
 /* details page pictures*/
 .previewpics{
@@ -134,7 +137,6 @@ max-width:30%;
 .previewpics .row{
   display: flex;
   flex-wrap: nowrap;
-  /* height:60vh; */
   width:auto;
   contain:content;
 }
@@ -158,7 +160,7 @@ height:auto;
   border-radius: 0;
   border:none;
   border-top: solid #e0ece4;
-  padding-top: 0.5rem;
+  padding: 0.5rem 0;
 }
 .card .row{
   width:100%;
@@ -166,41 +168,114 @@ height:auto;
 ul{
   list-style-type:circle;
 }
-/* modal */
-.bg-modal{
-  width:100%;
-  height:100%;
-  background-color: rgba(0,0,0,0.7);
-  position: absolute;
-  top:0;
-  display:flex;
-  justify-content: center;
-  align-items: center;
+.promo .row{
+  max-width: 400px;
+align-items: flex-end;
+margin-left: auto;
 }
-.signup.modal-content{
-  width:50%;
+.conBookMsg{
+  padding: 1em;
+  margin: .5em;
+  background-image: url("/static/images/info_pic5.jpg");
   background-color: white;
-  border-radius: 4px;
-  text-align: center;
-  position:relative;
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  min-height: 320px;
 }
-.modal-header{
-  padding: 2px 16px;
-  background-color: #e0ece4;
-  color: #797a7e;
+.conBookMsg .col{
+  background-color: white;
+  opacity: 0.7;
+  border-radius: 5px;
+  max-width: 370px;
+  padding: 1em .75em;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  color: black;
 }
-.modal-content input{
-  width:50%;
-  margin:15px auto;
-}
-.modal-content .row{
-  width:50%;
+/* login/register */
+.signup{
+  width:70%;
   margin:auto;
+  max-width: 300px;
 }
-.close{
-  position:absolute;
-  top:0;
-  right:14px;
-  font-size: 42px;
-  transform: rotate(45deg);
+.signup h2{
+  padding: .25em .5em;
+  border-radius: 5px;
+  background-color: #e0ece4;
 }
+form.col{
+  text-align: center;
+}
+form.col input{
+  margin:.5em;
+}
+form.col .row{
+  justify-content: center;
+}
+p.errMsg{
+  max-width: 175px;
+  margin:auto;
+  color: red;
+  font-size: .75em;
+  font-weight: bold;
+}
+@media only screen and (min-width: 600px){
+.socials{
+  float:right;
+}
+  img.infopic{
+    border: solid white;
+    padding: 1em;
+    margin-top: 1em;
+  }
+  iframe.infopic{
+    border: solid white;
+    padding: 1em;
+    margin-top: 1em;
+  }
+  .conBookMsg{
+    min-height: 600px;
+    }
+}
+
+@media only screen and (min-width: 700px){
+  .searchBar .row{
+    max-width: 700px;
+  }
+  .listing p{
+    font-size: 1rem;
+  }
+  .promo .row{
+    max-width: 700px;
+  }
+
+}
+
+@media only screen and (min-width: 1200px){
+  .promo{
+  float: right;
+  border-radius: 5px;
+  margin:.5em;
+  }
+  .sectionBreak{
+    border: 15px solid #f7f2e7;
+    padding: 1.5em;
+    margin: 1.5em;
+  }
+  .searchBar .row{
+    max-width:1300px;
+  }
+  .col.label{
+    max-width: 80px;
+  }
+  .col.option{
+    min-width: 150px;
+    max-width: 200px;
+  }
+  .row.searchResults{
+    max-width: 1200px;
+  }
+  .conBookMsg{
+    min-height: 700px;
+    }
+}
+

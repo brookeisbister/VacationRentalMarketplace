@@ -4,7 +4,10 @@
   "description": "Assignment 1 out of 6 for Web 322",
   "main": "main.js",
   "dependencies": {
-    "express": "^4.17.1"
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.2.0",
+    "nodemailer": "^6.4.14"
   },
   "devDependencies": {},
   "scripts": {
