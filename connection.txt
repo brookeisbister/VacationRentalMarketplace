@@ -1,0 +1,17 @@
+Atlas
+<connection string>
+mongodb+srv://dbBrooke:<password>@senecaweb.9fjuf.mongodb.net/<dbname>?retryWrites=true&w=majority
+<password>
+databasepassword
+<dbname>
+web322_assignment
+
+Local
+mongodb://localhost/<dbname>
+to run server in cmd: mongod
+in new cmd:	mongo
+		show dbs
+
+Compass
+to run server in cmd: mongod
+mongodb+srv://dbBrooke:<password>@senecaweb.9fjuf.mongodb.net/test

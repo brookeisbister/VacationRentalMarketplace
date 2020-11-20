@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AirB&B Search</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
@@ -16,7 +16,7 @@
     <div class="row searchResults">
         {{#each data}}
         <div class="listing">
-            <a href="/details"><img src="/static/images/{{pic}}" /></a>
+            <a href="/details"><img src="images/{{pic}}" /></a>
             <p>
                 {{type}} <br> {{title}} <br> ${{price}} CAD/night
             </p>

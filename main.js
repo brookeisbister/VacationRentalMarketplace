@@ -5,11 +5,15 @@ const path = require("path");
 const hbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');            //for email
+const mongoose = require("mongoose");
+mongoose.Promise = require("bluebird");
+const config = require("./js/config");
 
 //module initialization
 var HTTP_PORT = process.env.PORT || 8080;       //creating variable to designate a port if port isnt designated it sets it to 8080 
-app.engine('.hbs', hbs({ extname: '.hbs' }));
-app.set('view engine', '.hbs');
+const connectionString = config.dbconn;         //creating connection string
+app.engine('.hbs', hbs({ extname: '.hbs' }));   // Register handlebars as the rendering engine
+app.set('view engine', '.hbs');                 // Register handlebars as the rendering engine
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -18,9 +22,20 @@ var transporter = nodemailer.createTransport({
     }
 });
 
+//connect to mongoDB database
+let db = mongoose.createConnection(connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
+// log when the DB is connected
+db.on('error', (err) => {
+    console.log("Error - "+err);
+  });
+db.once("open", () => {
+console.log("Database connection open");
+});
+
 //navigation
 //to serve static files
-app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use(express.static('./views/'));
+app.use(express.static('./public/'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", function (req, res) {
