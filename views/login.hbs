@@ -16,12 +16,14 @@
 
   <div class="signup">
     <h2><img src="/static/images/winner.png" class="promo-icon" />Login</h2>
-
+    {{#if errmsg}}
+    <label class="errMsg">{{errmsg}}</label>
+    {{/if}}
     <form class="col" action="/login-for-process" method="POST">
-      <input type="text" id="email" name="email" maxlength="75" placeholder="Email">
-      <p class="errMsg">{{data.email}}</p>
-      <input type="password" id="pwd" name="pwd" maxlength="75" placeholder="Password">
-      <p class="errMsg">{{data.pwd}}</p>
+      <label class="fixedLabel">Account Email</label>
+      <input type="text" id="email" name="email" maxlength="75" value={{user.email}}>
+      <label class="fixedLabel">Password</label>
+      <input type="password" id="pwd" name="pwd" maxlength="75" value={{user.pwd}}>
       <button type="submit" class="btn btn-primary mb-2">Submit</button><br>
     </form>
 

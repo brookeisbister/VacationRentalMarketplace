@@ -16,24 +16,27 @@
 
   <div class="signup">
     <h2><img src="/static/images/winner.png" class="promo-icon" />New User</h2>
+    {{#if errmsg}}
+    <label class="errMsg">{{errmsg}}</label>
+    {{/if}}
     <form class="col" action="/register-for-process" method="POST">
-      <input type="text" name="fname" placeholder="First Name" />
-      <p class="errMsg">{{data.fname}}</p>
-      <input type="text" name="lname" placeholder="Last Name" />
-      <p class="errMsg">{{data.lname}}</p>
+    <label class="fixedLabel">First Name</label>
+      <input type="text" name="fname" value={{user.fname}}>
+      <label class="fixedLabel">Last Name</label>
+      <input type="text" name="lname" value={{user.lname}}>
       <div class="row">
-        <input type="radio" id="userowner" name="usertype" value="owner" />
+        <label class="fixedLabel" for="userowner" style="width: 100%">User Type</label>
+        <input type="radio" id="userowner" name="usertype" value="owner">
         <label for="userowner">Owner</label>
-        <input type="radio" id="userrenter" name="usertype" value="renter" />
+        <input type="radio" id="userrenter" name="usertype" value="renter">
         <label for="userrenter">Renter</label>
       </div>
-      <p class="errMsg">{{data.usertype}}</p>
-      <input type="email" name="email" placeholder="Email Address" />
-      <p class="errMsg">{{data.email}}</p>
-      <input type="password" name="pwd" placeholder="Create Password" />
-      <p class="errMsg">{{data.pwd}}</p>
-      <input type="password" name="checkpwd" placeholder="Confirm Password" />
-      <p class="errMsg">{{data.checkpwd}}</p>
+      <label class="fixedLabel">Email Address</label>
+      <input type="email" name="email" value={{user.email}}>
+      <label class="fixedLabel">Create Password</label>
+      <input type="password" name="pwd" placeholder="8-75 characters">
+      <label class="fixedLabel">Confirm Password</label>
+      <input type="password" name="checkpwd" placeholder="re-enter password">
       <button type="submit" class="btn btn-primary mb-2">Sign up</button><br>
     </form>
   </div>

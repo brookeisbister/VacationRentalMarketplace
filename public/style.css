@@ -211,13 +211,21 @@ form.col input{
 form.col .row{
   justify-content: center;
 }
-p.errMsg{
+.errMsg{
   max-width: 175px;
   margin:auto;
   color: red;
-  font-size: .75em;
-  font-weight: bold;
+  /* font-size: .75em; */
+  /* font-weight: bold; */
 }
+.fixedLabel{
+  margin:0;
+  font-size:1.2em;
+  color: #797a7e;
+  /* font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; */
+  /* font-weight: bold; */
+}
+/*Responsive*/
 @media only screen and (min-width: 600px){
 .socials{
   float:right;

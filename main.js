@@ -35,19 +35,19 @@ app.get("/searchResults", function (req, res) {
             pic: "listing1.jpg",
             type: "Single Room",
             title: "This Place is Great, I Ain't Lime",
-            price: 75
+            price: 324
         },
         {
             pic: "listing2.jpg",
             type: "Single Room",
             title: "Sweeter Dreams",
-            price: 75
+            price: -8
         },
         {
             pic: "listing3.jpg",
             type: "Entire House",
             title: "Pancakes or Eggs?",
-            price: 75
+            price: 4580
         },
         {
             pic: "listing4.jpg",
@@ -114,107 +114,54 @@ app.get("https:www.twitter.com", function (req, res) {
 
 app.post("/login-for-process",
     (req, res) => {
-        if (req.body.email) {
-            if (req.body.pwd) {
-                res.redirect('/');
-            }
-            else {
-                var pwdEmpty = { pwd: "must enter a password" };
-                res.render('login', {
-                    data: pwdEmpty,
-                    layout: false
-                })
-            }
+        const loginInfo = req.body; 
+        if(loginInfo.email === ""){
+            return res.render("login", {errmsg: "*email is missing", user: loginInfo, layout:false}); 
+        }else if(loginInfo.pwd === ""){
+            return res.render("login", {errmsg: "*password is missing", user: loginInfo, layout:false}); 
         }
-        else {
-            var emailEmpty = { email: "must enter an email" };
-            res.render('login', {
-                data: emailEmpty,
-                layout: false
-            })
+        else{
+            res.redirect('/');
         }
     });
-
-app.post("/register-for-process",
+    
+    app.post("/register-for-process",
     (req, res) => {
-        if (req.body.fname) {
-            if (req.body.lname) {
-                if (req.body.usertype) {
-                    if (req.body.email) {
-                        if (/^([a-z]|[0-9]|[!@#\$%\^&\*]){8,75}$/i.test(req.body.pwd)) {
-                            if (/\d/.test(req.body.pwd)) {
-                                if (/[!@#\$%\^&\*]/.test(req.body.pwd)) {
-                                    if (req.body.pwd == req.body.checkpwd) {
-                                        res.redirect('/dashboard');
-                                        var emailOptions = {
-                                            from: 'seneca.brookeisbister@gmail.com',
-                                            to: req.body.email,
-                                            subject: 'Welcome to AirB&B',
-                                            html: '<p>Hello ' + req.body.fname + ' ' + req.body.lname + ',<br/><br/>Thank you for registering with us!<br/><br/><br/>Sincerely,<br/>Customer Support</p>'
-                                        };
-                                        transporter.sendMail(emailOptions, (error, info) => {
-                                            if (error) {
-                                                console.log("ERROR: " + error)
-                                            } else {
-                                                console.log("Success: " + info.response);
-                                            }
-                                        })
-                                    } else {
-                                        var pwdCheck = { checkpwd: "passwords must match" };
-                                        res.render('userRegistration', {
-                                            data: pwdCheck,
-                                            layout: false
-                                        })
-                                    }
-                                } else {
-                                    var pwdNoSym = { pwd: "must contain a symbol !@#\$%\^&\*" };
-                                    res.render('userRegistration', {
-                                        data: pwdNoSym,
-                                        layout: false
-                                    })
-                                }
-                            } else {
-                                var pwdNoNum = { pwd: "must contain a number" };
-                                res.render('userRegistration', {
-                                    data: pwdNoNum,
-                                    layout: false
-                                })
-                            }
-                        } else {
-                            var pwdLength = { pwd: "must be 8-75 characters" };
-                            res.render('userRegistration', {
-                                data: pwdLength,
-                                layout: false
-                            })
-                        }
-                    } else {
-                        var emailEmpty = { email: "must enter an email" };
-                        res.render('userRegistration', {
-                            data: emailEmpty,
-                            layout: false
-                        })
-                    }
+        const regInfo = req.body; 
+        if (!regInfo.fname) {
+            return res.render("userRegistration", {errmsg: "*must enter first name", user: regInfo, layout:false}); 
+        }else if (!regInfo.lname) {
+            return res.render("userRegistration", {errmsg: "*must enter last name", user: regInfo, layout:false}); 
+        }else if (!regInfo.usertype) {
+            return res.render("userRegistration", {errmsg: "*must select user type", user: regInfo, layout:false}); 
+        }else if (!regInfo.email) {
+            return res.render("userRegistration", {errmsg: "*must enter an email", user: regInfo, layout:false}); 
+        }else if (!regInfo.pwd) {
+            return res.render("userRegistration", {errmsg: "*must enter password", user: regInfo, layout:false}); 
+        }else if (!/^([a-z]|[0-9]|[!@#\$%\^&\*]){8,75}$/i.test(regInfo.pwd)) {
+            return res.render("userRegistration", {errmsg: "*password must be 8-75 characters", user: regInfo, layout:false}); 
+        }else if (!/\d/.test(regInfo.pwd)) {
+            return res.render("userRegistration", {errmsg: "*password must contain a number", user: regInfo, layout:false}); 
+        }else if (!/[!@#\$%\^&\*]/.test(regInfo.pwd)) {
+            return res.render("userRegistration", {errmsg: "*password must contain a symbol !@#\$%\^&\*", user: regInfo, layout:false}); 
+        }else if (regInfo.pwd == regInfo.checkpwd) {
+            res.redirect('/dashboard');
+            var emailOptions = {
+                from: 'seneca.brookeisbister@gmail.com',
+                to: req.body.email,
+                subject: 'Welcome to AirB&B',
+                html: '<p>Hello ' + req.body.fname + ' ' + req.body.lname + ',<br/><br/>Thank you for registering with us!<br/><br/><br/>Sincerely,<br/>Customer Support</p>'
+            };
+            transporter.sendMail(emailOptions, (error, info) => {
+                if (error) {
+                    console.log("ERROR: " + error)
                 } else {
-                    var usertypeEmpty = { usertype: "must pick one" };
-                    res.render('userRegistration', {
-                        data: usertypeEmpty,
-                        layout: false
-                    })
+                    console.log("Success: " + info.response);
                 }
-            } else {
-                var lnameEmpty = { lname: "must enter last name" };
-                res.render('userRegistration', {
-                    data: lnameEmpty,
-                    layout: false
-                })
-            }
-        } else {
-            var fnameEmpty = { fname: "must enter first name" };
-            res.render('userRegistration', {
-                data: fnameEmpty,
-                layout: false
             })
-        }
+        }else {
+            return res.render("userRegistration", {errmsg: "*passwords must match", user: regInfo, layout:false});
+        }                         
     });
 
 //listening on the port
