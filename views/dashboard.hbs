@@ -34,25 +34,44 @@
     {{#if adminStatus}}
     <div class="card">
       <h4>Your Listings</h4>
+      {{#if editmsg}} <p>{{ editmsg }}</p> {{/if}}
+      <hr />
       {{#if hasListings}}
       <div class="uploadResults">
-      {{#each listings}}
+        {{#each listings}}
         <div class="listing">
           <a href="/details"><img src="photos/{{this.filename}}" /></a>
           <p>
             <b>{{this.title}}</b> <br> {{this.city}} <br>{{this.type}} <br> ${{this.price}} CAD/night<br><br>
             {{this.description}}
           </p>
+          <div class="remove" title="Remove photo">
+            <form action="/remove-listing/{{filename}}" method="post">
+              <button type="submit" class="btn btn-primary mb-2">
+                <img src="/images/trash_can.png" width="10" />
+              </button>
+            </form>
+          </div>
+          <div class="remove" title="Edit photo">
+            <form action="/edit-listing/{{filename}}" method="post">
+              <button type="submit" class="btn btn-primary mb-2">
+                <img src="/images/trash_can.png" width="10" />
+              </button>
+            </form>
+          </div>
         </div>
-      {{/each}}
+        {{/each}}
       </div>
       {{else}}
-      <p>No listings</p>
+      <ul>
+        <li>No listings</li>
+      </ul>
       {{/if}}
     </div>
     <div class="card">
-      <h4>Add New Listing</h4><hr/>
-         {{#if messaage}} <p>{{ message }}</p> {{/if}}
+      <hr />
+      <h4>Add New Listing</h4>
+      {{#if uploadmsg}} <p>{{ uploadmsg }}</p> {{/if}}
       <form action="/add-listing" method="POST" enctype="multipart/form-data">
         <label class="fixedLabel">Listing Type</label>
         <select class="upload-form" id="type" name="type" required>
@@ -63,7 +82,8 @@
         <label class="fixedLabel">Listing Name</label>
         <input class="upload-form" type="text" id="title" name="title" maxlength="75" required>
         <label class="fixedLabel">Description</label>
-        <input class="upload-form" style="width:450px; height: 4em;" type="text" id="description" name="description" required>
+        <input class="upload-form" style="width:450px; height: 4em;" type="text" id="description" name="description"
+          required>
         <label class="fixedLabel">Location</label>
         <select class="upload-form" id="city" name="city" required>
           <option selected></option>
@@ -76,8 +96,8 @@
         <input class="upload-form" type="number" min="1" step="0.01" id="price" name="price" required>
         <label class="fixedLabel" for="photo">Upload Photo</label>
         <input id="photo" name="photo" type="file" /><br>
-        <hr/>
-     <button type="submit" class="btn btn-primary mb-2">Confirm</button><br>
+        <hr />
+        <button type="submit" class="btn btn-primary mb-2">Confirm</button><br>
       </form>
     </div>
     {{/if}}

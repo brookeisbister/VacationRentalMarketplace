@@ -13,41 +13,9 @@
 <body>
   {{> nav user}}
   {{> header}}
+{{> searchBar}}
 
-  <div class="searchBar">
-    <div class="row">
-      <div class="col label"><label for="searchLocation">WHERE</label></div>
-      <div class="col option">
-        <select id="searchLocation" class="form-control">
-          <option selected>Anywhere...</option>
-          <option value="Toronto">Toronto</option>
-          <option value="Halifax">Halifax</option>
-          <option value="Vancouver">Vancouver</option>
-          <option value="Saskatoon">Saskatoon</option>
-        </select>
-      </div>
-      <div class="col label"><label for="guestCount">GUESTS</label></div>
-      <div class="col option">
-        <select id="guestCount" class="form-control">
-          <option selected>Choose...</option>
-          <option value="1">1 Guest</option>
-          <option value="2">2 Guests</option>
-          <option value="3">3 Guests</option>
-        </select>
-      </div>
-      <div class="col label"><label for="startDate">CHECK-IN</label></div>
-      <div class="col option">
-        <input type="date" class="form-control" id="startDate">
-      </div>
-      <div class="col label"><label for="endDate">CHECKOUT</label></div>
-      <div class="col option">
-        <input type="date" class="form-control" id="endDate">
-      </div>
-      <div class="col label">
-        <a href="/searchResults"> <button type="submit" class="btn btn-primary mb-2">Search</button></a>
-      </div>
-    </div>
-  </div>
+
 
   <div class="sectionBreak">
 

@@ -68,6 +68,7 @@ function checkLogin(req, res, next) {
     if (!req.session.user) {
         res.redirect("/login", { errmsg: "Unauthorized access, please login", layout: false });
     } else {
+        console.log(req.session.user);
         next(); //exit function
     }
 };
@@ -103,19 +104,11 @@ app.get("/dashboard", checkLogin, (req, res) => {
         listingModel.find({ userID: req.session.user.email }).lean()
             .exec()
             .then((listings) => {
-                res.render('dashboard', { user: req.session.user, adminStatus: admin, message: req.body.errmsg, listings: listings, hasListings: !!listings.length, layout: false });
+                res.render('dashboard', { user: req.session.user, adminStatus: admin, uploadmsg: req.params.uploadmsg, editmsg: req.params.editmsg, listings: listings, hasListings: !!listings.length, layout: false });
             });
     } else {
         res.render('dashboard', { user: req.session.user, layout: false });
     }
-});
-
-app.get("/searchResults", function (req, res) {
-    listingModel.find().lean()                 //retrieve all documents and convert mongoose document to javascript object
-        .exec()                             //format to promise
-        .then((listings) => {
-            res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
-        });
 });
 
 app.get("/details", function (req, res) {
@@ -261,11 +254,68 @@ app.post("/add-listing", upload.single("photo"), (req, res) => {
     listingMetadata.save()
         .then(() => {
             res.redirect("/dashboard");
+            //res.render('dashboard', { user: req.session.user, adminStatus: admin, uploadmsg: "New listing successfully added", listings: listings, hasListings: !!listings.length, layout: false });
         })
         .catch((err) => {
-            res.redirect("/dashboard", {errmsg: "There was an error uploading your photo"});
+            res.redirect("/dashboard");
+            //res.render('dashboard', { user: req.session.user, adminStatus: admin, uploadmsg: "There was an error uploading your photo", listings: listings, hasListings: !!listings.length, layout: false });
             console.log(err);
         });
 });
+
+app.post("/remove-listing/:filename", (req, res) => {
+    const filename = req.params.filename;   // req.params holds the dynamic parameters of a url
+
+    // remove the photo
+    listingModel.remove({ filename: filename })
+        .then(() => {
+            // now remove the file from the file system.
+            fs.unlink(PHOTODIRECTORY + filename, (err) => {
+                if (err) {
+                    return console.log(err);
+                }
+                console.log("Removed file : " + filename);
+            });
+            // redirect to home page once the removal is done.
+            res.redirect("/dashboard");
+            //res.render('dashboard', { user: req.session.user, adminStatus: admin, editmsg: "Listing removed", listings: listings, hasListings: !!listings.length, layout: false });
+        }).catch((err) => {
+            // if there was an error removing the photo, log it, and redirect.
+            console.log(err);
+            res.redirect("/dashboard");
+            //res.render('dashboard', { user: req.session.user, adminStatus: admin, editmsg: "Error removing listing", listings: listings, hasListings: !!listings.length, layout: false });
+        });
+});
+
+app.post("/edit-listing/:filename", (req, res) => {
+    const filename = req.params.filename;   // req.params holds the dynamic parameters of a url
+
+    listingModel.updateOne({ filename: filename })
+        .then(() => {
+
+        }).catch((err) => {
+            console.log(err);
+            res.redirect("/dashboard");
+
+        });
+});
+
+app.get("/search-results", (req, res)=>{
+    const location = req.query.searchLocation;
+    if(location == "Anywhere..."){
+        listingModel.find().lean()                 //retrieve all documents and convert mongoose document to javascript object
+        .exec()                             //format to promise
+        .then((listings) => {
+            res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
+        });
+    }else{
+        listingModel.find({city:location}).lean()                 //retrieve all documents and convert mongoose document to javascript object
+        .exec()                             //format to promise
+        .then((listings) => {
+            res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
+        });
+    }
+
+})
 //listening on the port
 app.listen(HTTP_PORT, onHttpStart);
