@@ -8,13 +8,15 @@ var nodemailer = require('nodemailer');            //for email
 const mongoose = require("mongoose");
 mongoose.Promise = require("bluebird");
 const clientsessions = require("client-sessions");
+const multer = require("multer");
+const fs = require("fs");
 
 
 //connect to other documents
 const config = require("./js/config");
 const userModel = require("./models/userModel");
 const listingModel = require("./models/listingModel");
-const e = require("express");
+const PHOTODIRECTORY = "./public/photos/";
 
 //module initialization
 var HTTP_PORT = process.env.PORT || 8080;       //creating variable to designate a port if port isnt designated it sets it to 8080 
@@ -40,7 +42,23 @@ app.use(clientsessions({
     duration: 1000 * 60 * 5,    //duration in milisec
     activeDuration: 1000 * 60 * 5
 }))
-
+// make sure the photos folder exists
+// if not create it
+if (!fs.existsSync(PHOTODIRECTORY)) {
+    fs.mkdirSync(PHOTODIRECTORY);
+}
+//multer setup
+const storage = multer.diskStorage({
+    destination: PHOTODIRECTORY,
+    filename: (req, file, cb) => {
+        // we write the filename as the current date down to the millisecond
+        // in a large web service this would possibly cause a problem if two people
+        // uploaded an image at the exact same time. A better way would be to use GUID's for filenames.
+        // this is a simple example.
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });  // tell multer to use the diskStorage function for naming files instead of the default.
 //startup function
 function onHttpStart() {
     console.log("Express http server listening on: " + HTTP_PORT);
@@ -71,7 +89,6 @@ app.get("/login", function (req, res) {
 });
 
 app.get("/logout", (req, res) => {
-    //delete session variables with reset method
     req.session.reset();
     res.redirect("/");
 })
@@ -81,7 +98,16 @@ app.get("/userRegistration", function (req, res) {
 });
 
 app.get("/dashboard", checkLogin, (req, res) => {
-    res.render('dashboard', { user: req.session.user, layout: false });
+    if (req.session.user.usertype == "admin") {
+        var admin = true;
+        listingModel.find({ userID: req.session.user.email }).lean()
+            .exec()
+            .then((listings) => {
+                res.render('dashboard', { user: req.session.user, adminStatus: admin, message: req.body.errmsg, listings: listings, hasListings: !!listings.length, layout: false });
+            });
+    } else {
+        res.render('dashboard', { user: req.session.user, layout: false });
+    }
 });
 
 app.get("/searchResults", function (req, res) {
@@ -221,5 +247,25 @@ app.post("/register-for-process",
         }
     });
 
+app.post("/add-listing", upload.single("photo"), (req, res) => {
+    const listingMetadata = new listingModel({
+        userID: req.session.user.email,
+        type: req.body.type,
+        title: req.body.title,
+        description: req.body.description,
+        price: req.body.price,
+        city: req.body.city,
+        filename: req.file.filename
+    });
+
+    listingMetadata.save()
+        .then(() => {
+            res.redirect("/dashboard");
+        })
+        .catch((err) => {
+            res.redirect("/dashboard", {errmsg: "There was an error uploading your photo"});
+            console.log(err);
+        });
+});
 //listening on the port
 app.listen(HTTP_PORT, onHttpStart);

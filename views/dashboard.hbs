@@ -28,9 +28,59 @@
         <li>Account Type: {{user.usertype}}</li>
         <li>Name: {{user.fname}} {{user.lname}}</li>
         <li>Email: {{user.email}}</li>
-        <li>Member since: {{user.createdOn}}</li>
+        <li>Member Since: {{user.createdOn}}</li>
       </ul>
     </div>
+    {{#if adminStatus}}
+    <div class="card">
+      <h4>Your Listings</h4>
+      {{#if hasListings}}
+      <div class="uploadResults">
+      {{#each listings}}
+        <div class="listing">
+          <a href="/details"><img src="photos/{{this.filename}}" /></a>
+          <p>
+            <b>{{this.title}}</b> <br> {{this.city}} <br>{{this.type}} <br> ${{this.price}} CAD/night<br><br>
+            {{this.description}}
+          </p>
+        </div>
+      {{/each}}
+      </div>
+      {{else}}
+      <p>No listings</p>
+      {{/if}}
+    </div>
+    <div class="card">
+      <h4>Add New Listing</h4><hr/>
+         {{#if messaage}} <p>{{ message }}</p> {{/if}}
+      <form action="/add-listing" method="POST" enctype="multipart/form-data">
+        <label class="fixedLabel">Listing Type</label>
+        <select class="upload-form" id="type" name="type" required>
+          <option selected></option>
+          <option value="Single Room">Single Room</option>
+          <option value="Entire House">Entire House</option>
+        </select>
+        <label class="fixedLabel">Listing Name</label>
+        <input class="upload-form" type="text" id="title" name="title" maxlength="75" required>
+        <label class="fixedLabel">Description</label>
+        <input class="upload-form" style="width:450px; height: 4em;" type="text" id="description" name="description" required>
+        <label class="fixedLabel">Location</label>
+        <select class="upload-form" id="city" name="city" required>
+          <option selected></option>
+          <option value="Toronto">Toronto</option>
+          <option value="Halifax">Halifax</option>
+          <option value="Vancouver">Vancouver</option>
+          <option value="Saskatoon">Saskatoon</option>
+        </select>
+        <label class="fixedLabel">Price per night</label>
+        <input class="upload-form" type="number" min="1" step="0.01" id="price" name="price" required>
+        <label class="fixedLabel" for="photo">Upload Photo</label>
+        <input id="photo" name="photo" type="file" /><br>
+        <hr/>
+     <button type="submit" class="btn btn-primary mb-2">Confirm</button><br>
+      </form>
+    </div>
+    {{/if}}
   </div>
 
   {{> footer}}
