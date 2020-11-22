@@ -11,17 +11,19 @@
 </head>
 
 <body>
-    {{> nav}}
+    {{> nav user}}
     {{> header}}
     <div class="row searchResults">
-        {{#each data}}
+       {{#if hasListings}} {{#each listings}}
         <div class="listing">
-            <a href="/details"><img src="images/{{pic}}" /></a>
+            <a href="/details"><img src="images/{{this.filename}}" /></a>
             <p>
-                {{type}} <br> {{title}} <br> ${{price}} CAD/night
+               <b>{{this.title}}</b> <br> {{this.city}} <br>{{this.type}} <br>  ${{this.price}} CAD/night
             </p>
         </div>
-        {{/each}}
+        {{/each}} {{else}}
+        <p>No listings match your search</p>
+        {{/if}}
     </div>
     {{> footer}}
 </body>

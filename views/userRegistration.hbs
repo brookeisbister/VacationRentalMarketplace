@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  {{> nav}}
+  {{> nav user}}
   {{> header}}
 
   <div class="signup">
@@ -25,7 +25,7 @@
       <label class="fixedLabel">Last Name</label>
       <input type="text" name="lname" value={{user.lname}}>
       <div class="row">
-        <label class="fixedLabel" for="userowner" style="width: 100%">User Type</label>
+        <label class="fixedLabel">User Type</label>
         <input type="radio" id="userowner" name="usertype" value="owner">
         <label for="userowner">Owner</label>
         <input type="radio" id="userrenter" name="usertype" value="renter">

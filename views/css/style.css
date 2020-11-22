@@ -212,13 +212,14 @@ form.col .row{
   justify-content: center;
 }
 .errMsg{
-  max-width: 175px;
+  width:100%;
   margin:auto;
   color: red;
   /* font-size: .75em; */
   /* font-weight: bold; */
 }
 .fixedLabel{
+  width:100%;
   margin:0;
   font-size:1.2em;
   color: #797a7e;
