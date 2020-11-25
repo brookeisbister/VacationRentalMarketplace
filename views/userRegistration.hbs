@@ -1,14 +1,7 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AirB&B Register</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-</head>
+{{> head}}
 
 <body>
   {{> nav user}}
@@ -21,9 +14,9 @@
     {{/if}}
     <form class="col" action="/register-for-process" method="POST">
     <label class="fixedLabel">First Name</label>
-      <input type="text" name="fname" value={{user.fname}}>
+      <input type="text" name="fname" value={{inputUser.fname}}>
       <label class="fixedLabel">Last Name</label>
-      <input type="text" name="lname" value={{user.lname}}>
+      <input type="text" name="lname" value={{inputUser.lname}}>
       <div class="row">
         <label class="fixedLabel">User Type</label>
         <input type="radio" id="userowner" name="usertype" value="owner">
@@ -32,7 +25,7 @@
         <label for="userrenter">Renter</label>
       </div>
       <label class="fixedLabel">Email Address</label>
-      <input type="email" name="email" value={{user.email}}>
+      <input type="email" name="email" value={{inputUser.email}}>
       <label class="fixedLabel">Create Password</label>
       <input type="password" name="pwd" placeholder="8-75 characters">
       <label class="fixedLabel">Confirm Password</label>

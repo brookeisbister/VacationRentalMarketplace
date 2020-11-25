@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html>
+        {{!-- for text editor --}}
+        <script src='js\tinymce.min.js'></script>
+        <script>
+          function textboxinit() {
+            tinymce.init({
+              selector: '#description',
+              width: 600,
+              height: 300
+            });
+          }
+        </script>
+{{> head}}
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AirB&B Dashboard</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-</head>
-
-<body>
+<body onload='textboxinit();'>
   {{> nav user}}
   {{> header}}
   <div class="details">
     <h2>Welcome to your Dashboard</h2>
     <div class="promo">
-      <p>0 reviews | 0 trips | 0 visits</p>
+      <p>{{user.reviews}} reviews | {{user.trips}} trips | {{user.visits}} visits</p>
     </div>
     <div class="card">
       <h4>Notifications</h4>
@@ -31,11 +34,40 @@
         <li>Member Since: {{user.createdOn}}</li>
       </ul>
     </div>
+        <div class="card">
+      <h4>Your Bookings</h4>
+      {{#if hasBookings}}
+        {{#each bookings}}
+        <hr>
+            <table>
+                <tr >
+                    <td class="tabletitle">Confirmation Number: </td>
+                    <td class="tabledata">{{this._id}}</td>
+                </tr>
+                <tr>
+                    <td class="tabletitle">Check-in:</td>
+                    <td class="tabledata">{{this.startDate}}</td>
+                </tr>
+                <tr>
+                    <td class="tabletitle">Check-out:</td>
+                    <td class="tabledata">{{this.startDate}}</td>
+                </tr>
+                <tr>
+                    <td class="tabletitle">Total:</td>
+                    <td class="tabledata">{{this.totalPrice}}</td>
+                </tr>
+            </table>
+        {{/each}}
+      {{else}}
+      <ul>
+        <li>No bookings</li>
+      </ul>
+      {{/if}}
+    </div>
+
     {{#if adminStatus}}
     <div class="card">
       <h4>Your Listings</h4>
-      {{#if editmsg}} <p>{{ editmsg }}</p> {{/if}}
-      <hr />
       {{#if hasListings}}
       <div class="uploadResults">
         {{#each listings}}
@@ -43,22 +75,23 @@
           <a href="/details"><img src="photos/{{this.filename}}" /></a>
           <p>
             <b>{{this.title}}</b> <br> {{this.city}} <br>{{this.type}} <br> ${{this.price}} CAD/night<br><br>
-            {{this.description}}
+            {{{this.description}}}
           </p>
-          <div class="remove" title="Remove photo">
-            <form action="/remove-listing/{{filename}}" method="post">
+          <div class="row remove">
+            <form class="remove" title="Remove photo" action="/remove-listing/{{filename}}" method="post">
               <button type="submit" class="btn btn-primary mb-2">
                 <img src="/images/trash_can.png" width="10" />
               </button>
             </form>
-          </div>
-          <div class="remove" title="Edit photo">
-            <form action="/edit-listing/{{filename}}" method="post">
+
+            <form class="remove" title="Edit photo" action="/edit-listing/{{filename}}" method="post">
               <button type="submit" class="btn btn-primary mb-2">
-                <img src="/images/trash_can.png" width="10" />
+                <img src="/images/edit.png" width="10" />
               </button>
             </form>
+
           </div>
+
         </div>
         {{/each}}
       </div>
@@ -69,9 +102,7 @@
       {{/if}}
     </div>
     <div class="card">
-      <hr />
       <h4>Add New Listing</h4>
-      {{#if uploadmsg}} <p>{{ uploadmsg }}</p> {{/if}}
       <form action="/add-listing" method="POST" enctype="multipart/form-data">
         <label class="fixedLabel">Listing Type</label>
         <select class="upload-form" id="type" name="type" required>
@@ -81,9 +112,8 @@
         </select>
         <label class="fixedLabel">Listing Name</label>
         <input class="upload-form" type="text" id="title" name="title" maxlength="75" required>
-        <label class="fixedLabel">Description</label>
-        <input class="upload-form" style="width:450px; height: 4em;" type="text" id="description" name="description"
-          required>
+        <label class="fixedLabel">Add a Description of your Listing</label>
+        <textarea id="description" name="description" value=""></textarea>
         <label class="fixedLabel">Location</label>
         <select class="upload-form" id="city" name="city" required>
           <option selected></option>
@@ -95,7 +125,7 @@
         <label class="fixedLabel">Price per night</label>
         <input class="upload-form" type="number" min="1" step="0.01" id="price" name="price" required>
         <label class="fixedLabel" for="photo">Upload Photo</label>
-        <input id="photo" name="photo" type="file" /><br>
+        <input id="photo" name="photo" type="file" required><br>
         <hr />
         <button type="submit" class="btn btn-primary mb-2">Confirm</button><br>
       </form>

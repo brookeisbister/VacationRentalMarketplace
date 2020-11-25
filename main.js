@@ -11,11 +11,11 @@ const clientsessions = require("client-sessions");
 const multer = require("multer");
 const fs = require("fs");
 
-
 //connect to other documents
 const config = require("./js/config");
 const userModel = require("./models/userModel");
 const listingModel = require("./models/listingModel");
+const bookingModel = require("./models/bookingModel");
 const PHOTODIRECTORY = "./public/photos/";
 
 //module initialization
@@ -66,9 +66,8 @@ function onHttpStart() {
 //check login function
 function checkLogin(req, res, next) {
     if (!req.session.user) {
-        res.redirect("/login", { errmsg: "Unauthorized access, please login", layout: false });
+        res.render("login", { errmsg: "Unauthorized access, please login", layout: false });
     } else {
-        console.log(req.session.user);
         next(); //exit function
     }
 };
@@ -99,26 +98,43 @@ app.get("/userRegistration", function (req, res) {
 });
 
 app.get("/dashboard", checkLogin, (req, res) => {
-    if (req.session.user.usertype == "admin") {
-        var admin = true;
-        listingModel.find({ userID: req.session.user.email }).lean()
+    userModel.findOne({_id: req.session.user.userID}).lean()
+    .exec()
+    .then((user)=>{
+    if (user) {
+        var admin = (user.usertype == "admin");
+        user.createdOn = new Date(user.createdOn).toDateString();
+        listingModel.find({ userID: user.email }).lean()
             .exec()
             .then((listings) => {
-                res.render('dashboard', { user: req.session.user, adminStatus: admin, uploadmsg: req.params.uploadmsg, editmsg: req.params.editmsg, listings: listings, hasListings: !!listings.length, layout: false });
+                bookingModel.find({ guestID: user.email }).lean()
+                .exec()
+                .then((bookings) => {
+                    res.render('dashboard', { user: user, adminStatus: admin, bookings: bookings, hasBookings: !!bookings.length, listings: listings, hasListings: !!listings.length, layout: false });
+                });
             });
     } else {
         res.render('dashboard', { user: req.session.user, layout: false });
     }
+    })
+
 });
 
 app.get("/details", function (req, res) {
     res.render('details', { user: req.session.user, layout: false });
 });
 
-app.get("/confirmation", function (req, res) {
-    res.render('confirmation', {
-        user: req.session.user, layout: false
-    });
+app.get("/confirmation/:_id", function (req, res) {
+    const bookingID = req.params._id;
+    bookingModel.findOne({ _id: bookingID }).lean()
+        .exec()
+        .then((booking) => {
+            booking.startDate = new Date(booking.startDate).toDateString();
+            booking.endDate = new Date(booking.endDate).toDateString()
+            res.render('confirmation', {
+                user: req.session.user, booking: booking, layout: false
+            });
+        });
 });
 //socials
 app.get("https:www.instagram.com", function (req, res) {
@@ -137,29 +153,23 @@ app.post("/login-for-process",
         const loginemail = req.body.email;
         const loginpwd = req.body.pwd;
         if (loginemail === "" || loginpwd === "") {
-            return res.render("login", { errmsg: "*fill in email and password", user: loginInfo, layout: false });
+            return res.render("login", { errmsg: "*fill in email and password", inputUser: loginInfo, layout: false });
         }
         else {
             userModel.findOne({ email: loginemail })
                 .exec()
                 .then((user) => {
                     if (!user) {
-                        return res.render("login", { errmsg: "*user does not exit, please register", user: loginInfo, layout: false });
+                        return res.render("login", { errmsg: "*user does not exit, please register", inputUser: loginInfo, layout: false });
                     } else {
                         if (user.pwd == loginpwd) {
                             req.session.user = {
-                                email: user.email,
-                                fname: user.fname,
-                                lname: user.lname,
-                                usertype: user.usertype,
-                                createdOn: new Date(user.createdOn).toDateString(),
-                                reviews: user.reviews,
-                                trips: user.trips,
-                                visits: user.visits
+                                userID: user._id,
+                                fname: user.fname
                             };
                             res.redirect("/dashboard");
                         } else {
-                            return res.render("login", { errmsg: "*incorrect password", user: loginInfo, layout: false });
+                            return res.render("login", { errmsg: "*incorrect password", inputUser: loginInfo, layout: false });
                         }
                     }
                 })
@@ -183,60 +193,56 @@ app.post("/register-for-process",
             "visits": regInfo.visits
         });
         if (!regInfo.fname) {
-            return res.render("userRegistration", { errmsg: "*must enter first name", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*must enter first name", inputUser: regInfo, layout: false });
         } else if (!regInfo.lname) {
-            return res.render("userRegistration", { errmsg: "*must enter last name", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*must enter last name", inputUser: regInfo, layout: false });
         } else if (!regInfo.usertype) {
-            return res.render("userRegistration", { errmsg: "*must select user type", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*must select user type", inputUser: regInfo, layout: false });
         } else if (!regInfo.email) {
-            return res.render("userRegistration", { errmsg: "*must enter an email", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*must enter an email", inputUser: regInfo, layout: false });
         } else if (!regInfo.pwd) {
-            return res.render("userRegistration", { errmsg: "*must enter password", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*must enter password", inputUser: regInfo, layout: false });
         } else if (!/^([a-z]|[0-9]|[!@#\$%\^&\*]){8,75}$/i.test(regInfo.pwd)) {
-            return res.render("userRegistration", { errmsg: "*password must be 8-75 characters", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*password must be 8-75 characters", inputUser: regInfo, layout: false });
         } else if (!/\d/.test(regInfo.pwd)) {
-            return res.render("userRegistration", { errmsg: "*password must contain a number", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*password must contain a number", inputUser: regInfo, layout: false });
         } else if (!/[!@#\$%\^&\*]/.test(regInfo.pwd)) {
-            return res.render("userRegistration", { errmsg: "*password must contain a symbol !@#\$%\^&\*", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*password must contain a symbol !@#\$%\^&\*", inputUser: regInfo, layout: false });
         } else if (regInfo.pwd == regInfo.checkpwd) {
             newUserMetadata.save()
                 .then((user) => {
-                    req.session.user = {
-                        email: user.email,
-                        fname: user.fname,
-                        lname: user.lname,
-                        usertype: user.usertype,
-                        createdOn: new Date(user.createdOn).toDateString(),
-                        reviews: user.reviews,
-                        trips: user.trips,
-                        visits: user.visits
-                    };
-                    res.redirect('/dashboard');
+                    if (!user) {
+                        req.session.user = {
+                                userID: user._id,
+                                fname: user.fname
+                        };
+                        res.redirect('/dashboard')
+                            .then(() => {
+                                var emailOptions = {
+                                    from: 'seneca.brookeisbister@gmail.com',
+                                    to: newUserMetadata.email,
+                                    subject: 'Welcome to AirB&B',
+                                    html: '<p>Hello ' + newUserMetadata.fname + ' ' + newUserMetadata.lname + ',<br/><br/>Thank you for registering with us!<br/><br/><br/>Sincerely,<br/>Customer Support</p>'
+                                };
+                                transporter.sendMail(emailOptions, (info, error) => {
+                                    console.log("Success: " + info.response);
+                                })
+                            })
+                            .catch((err) => {
+                                if (err) { console.log("ERROR: " + err); }
+                            })
+                    }
                 })
                 .catch((err) => {
                     if (err.code === 11000) {
-                        return res.render("userRegistration", { errmsg: "*email already registered", user: regInfo, layout: false });
+                        return res.render("userRegistration", { errmsg: "*email already registered", inputUser: regInfo, layout: false });
                     } else {
                         console.log(err);
-                        return res.render("userRegistration", { errmsg: "*There was an error registering", user: regInfo, layout: false });
+                        return res.render("userRegistration", { errmsg: "*There was an error registering", inputUser: regInfo, layout: false });
                     }
-                })
-                .then(() => {
-                    var emailOptions = {
-                        from: 'seneca.brookeisbister@gmail.com',
-                        to: newUserMetadata.email,
-                        subject: 'Welcome to AirB&B',
-                        html: '<p>Hello ' + newUserMetadata.fname + ' ' + newUserMetadata.lname + ',<br/><br/>Thank you for registering with us!<br/><br/><br/>Sincerely,<br/>Customer Support</p>'
-                    };
-                    transporter.sendMail(emailOptions, (info, error) => {
-                        console.log("Success: " + info.response);
-                    })
-                })
-                .catch((err) => {
-                    if (err) { console.log("ERROR: " + err); }
-                })
+                });
         } else {
-            return res.render("userRegistration", { errmsg: "*passwords must match", user: regInfo, layout: false });
+            return res.render("userRegistration", { errmsg: "*passwords must match", inputUser: regInfo, layout: false });
         }
     });
 
@@ -254,12 +260,14 @@ app.post("/add-listing", upload.single("photo"), (req, res) => {
     listingMetadata.save()
         .then(() => {
             res.redirect("/dashboard");
-            //res.render('dashboard', { user: req.session.user, adminStatus: admin, uploadmsg: "New listing successfully added", listings: listings, hasListings: !!listings.length, layout: false });
         })
         .catch((err) => {
-            res.redirect("/dashboard");
-            //res.render('dashboard', { user: req.session.user, adminStatus: admin, uploadmsg: "There was an error uploading your photo", listings: listings, hasListings: !!listings.length, layout: false });
-            console.log(err);
+            if (err.code === 11000) {
+                res.send(err);
+            } else {
+                console.log(err);
+                res.redirect("/dashboard");
+            }
         });
 });
 
@@ -300,22 +308,98 @@ app.post("/edit-listing/:filename", (req, res) => {
         });
 });
 
-app.get("/search-results", (req, res)=>{
+app.get("/search-results", (req, res) => {
     const location = req.query.searchLocation;
-    if(location == "Anywhere..."){
+    if (location == "Anywhere...") {
         listingModel.find().lean()                 //retrieve all documents and convert mongoose document to javascript object
-        .exec()                             //format to promise
-        .then((listings) => {
-            res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
-        });
-    }else{
-        listingModel.find({city:location}).lean()                 //retrieve all documents and convert mongoose document to javascript object
-        .exec()                             //format to promise
-        .then((listings) => {
-            res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
-        });
+            .exec()                             //format to promise
+            .then((listings) => {
+                res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
+            });
+    } else {
+        listingModel.find({ city: location }).lean()                 //retrieve all documents and convert mongoose document to javascript object
+            .exec()                             //format to promise
+            .then((listings) => {
+                res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
+            });
     }
 
 })
+
+app.get("/details/:_id", (req, res) => {
+    const listingID = req.params._id;
+    listingModel.findOne({ _id: listingID }).lean()
+        .exec()
+        .then((listing) => {
+            userModel.findOne({ email: listing.userID }).lean()
+                .exec()
+                .then((owner) => {
+                    return res.render('details', { user: req.session.user, listing: listing, owner: owner, layout: false });
+                })
+        });
+})
+
+app.post("/create-booking", checkLogin, (req, res) => {
+    // //delete testing bookings - remove later
+    // bookingModel.deleteMany({}).exec().then((result, err) => {
+    //     console.log(result);
+    //     console.log(err);
+    // });
+    const bookingInfo = req.body;
+    userModel.findOne({_id: req.session.user.userID}).lean()
+    .exec()
+    .then((guest)=>{
+         if (bookingInfo.bookingStart && bookingInfo.bookingEnd) {
+        const newBookingMetadata = new bookingModel({
+            "guestID": guest.email,
+            "listingID": bookingInfo.listingID,
+            "startDate": bookingInfo.bookingStart,
+            "endDate": bookingInfo.bookingEnd,
+            "length": bookingInfo.stayLength,
+            "totalPrice": bookingInfo.cost
+        });
+        newBookingMetadata.save()
+            .then((booking) => {
+                //go to confirmation page
+                res.redirect('/confirmation/' + booking._id)
+                //send confirmation email
+                var emailOptions = {
+                    from: 'seneca.brookeisbister@gmail.com',
+                    to: newBookingMetadata.guestID,
+                    subject: 'AirB&B Booking Confirmation',
+                    html:  `<p>Hello ${guest.fname} ${guest.lname},</p><p>Your reservation is confirmed. Thank you!</p><p><strong>Booking Details</strong></p><p style="padding-left: 40px;"><strong>Confirmation Code:</strong> ${booking._id}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-in:</strong> ${booking.startDate}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-out:</strong> ${booking.endDate}</p><p style="padding-left: 40px;"><strong>Total:</strong> ${booking.totalPrice}</p><p>&nbsp;</p><p>Enjoy your stay,</p><p>Customer Support</p>`
+                };
+                transporter.sendMail(emailOptions, (info, error) => {
+                    console.log("Success: " + info.response);
+                })
+                //update guest trip stat
+                userModel.updateOne(
+                    { email: newBookingMetadata.guestID },
+                    { $inc: { trips: 1 } }
+                ).exec().then((result, err) => {
+                    // console.log(result);
+                    // console.log(err);
+                });
+                //update owner visit stat
+                userModel.updateOne(
+                    { _id: bookingInfo.ownerID },
+                    { $inc: { visits: 1 } }
+                ).exec().then((result, err) => {
+                    // console.log(result);
+                    // console.log(err);
+                });
+
+            })
+            .catch((err) => {
+                console.log(err);
+                res.redirect('/details/' + bookingInfo.listingID);
+            });
+    } else {
+        res.redirect('/details/' + bookingInfo.listingID);
+    }
+    })
+   
+})
+
 //listening on the port
 app.listen(HTTP_PORT, onHttpStart);

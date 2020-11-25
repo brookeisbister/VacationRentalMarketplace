@@ -1,45 +1,39 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AirB&B Booking Confirmation</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-</head>
+{{> head}}
 
 <body>
     {{> nav user}}
     {{> header}}
     <div class="conBookMsg">
         <div class="col">
-            <h1>SEE YOU SOON!</h1>
+            <h1>SEE YOU SOON!</h1>  <hr>
             <p style="color: black">
-                Thank you for booking with us! <br><br>Here's your booking information: <br> Booking Reference
-                Number: 1 <br>
+               Your reservation is confirmed. Thank you!<br> <br>
+               <b>Booking Details</b>
+            <table>
+                <tr >
+                    <td class="tabletitle">Confirmation Number: </td>
+                    <td class="tabledata">{{booking._id}}</td>
+                </tr>
+                <tr>
+                    <td class="tabletitle">Check-in:</td>
+                    <td class="tabledata">{{booking.startDate}}</td>
+                </tr>
+                <tr>
+                    <td class="tabletitle">Check-out:</td>
+                    <td class="tabledata">{{booking.startDate}}</td>
+                </tr>
+                <tr>
+                    <td class="tabletitle">Total:</td>
+                    <td class="tabledata">{{booking.totalPrice}}</td>
+                </tr>
+            </table>
+<hr>
             </p>
         </div>
     </div>
-    {{!-- <div class="sectionBreak">
-        <div class="conBookMsg">
-            <div class="row">
-                <div class="col conBookMsg">
-                    <h1>SEE YOU SOON!</h1>
-                    <p>
-                        Thank you for booking with us! <br> Here's your booking information: <br> Booking Reference
-                        Number: 1 <br>
-                    </p>
-                </div>
-                 <div class="col conBookMsg">
-                <img class="infopic" src="/static/images/info_pic5.jpg" />
-
-                <img class="infopic" src="/static/images/info_pic2.jpg" />
-                 </div>
-            </div>
-        </div>
-    </div> --}}
 
     {{> footer}}
 </body>

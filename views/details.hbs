@@ -1,23 +1,16 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AirB&B Listing Details</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-</head>
+{{> head}}
 
 <body>
     {{> nav user}}
     {{> header}}
     <div class="details">
-        <h2>Pancakes or Eggs?</h2>
+        <h2>{{listing.title}}</h2>
         <div class="card">
             <div class="row">
-                <p class="col">Vancouver, BC, Canada</p>
+                <p class="col">{{listing.city}}, Canada</p>
                 <button type="button" class="btn btn-primary mb-2">Add to Favourites</button>
                 <button type="button" class="btn btn-primary mb-2">SHARE</button>
             </div>
@@ -25,48 +18,51 @@
         <div class="previewpics">
             <div class="row">
                 <div class="col">
-                    <img src="images/listing3bed.jpg" />
+                    <img src="/photos/listing3bed.jpg" />
                 </div>
                 <div class="col">
-                    <img src="images/listing3.jpg" />
-                    <img src="images/listing3bathroom.jpg" />
+                    <img src="/photos/{{listing.filename}}" />
+                    <img src="/photos/listing3bathroom.jpg" />
                 </div>
                 <div class="col">
-                    <img src="images/listing3kitchen.jpg" />
-                    <img src="images/listing3terrace.jpg" />
+                    <img src="/photos/listing3kitchen.jpg" />
+                    <img src="/photos/listing3terrace.jpg" />
                 </div>
             </div>
         </div>
-
-        <div class="promo">
-            <div class="row">
-                <div class="col label"><label for="startDate">CHECK-IN</label></div>
-                <div class="col option">
-                    <input type="date" class="form-control" id="startDate">
+            <div class="promo" id="booknow">
+        <form action="/create-booking" method="POST">
+                <div class="row">
+                    <div class="col label"><label for="startDate">CHECK-IN</label></div>
+                    <div class="col option">
+                        <input type="date" class="form-control" id="startDate" required>
+                    </div>
+                    <div class="col label"><label for="endDate">CHECKOUT</label></div>
+                    <div class="col option" style="margin-right: 1em;">
+                        <input type="date" class="form-control" id="endDate" oninput="calculate({{listing.price}})" required>
+                    </div>
                 </div>
-                <div class="col label"><label for="endDate">CHECKOUT</label></div>
-                <div class="col option">
-                    <input type="date" class="form-control" id="endDate">
+                <div class="row left-align">
+                    <p id="costEst" hidden></p>
                 </div>
+                <input type="hidden" id="listingID" name="listingID" value={{listing._id}}>
+                <input type="hidden" id="bookingStart" name="bookingStart">
+                <input type="hidden" id="bookingEnd" name="bookingEnd">
+                <input type="hidden" id="stayLength" name="stayLength">
+                <input type="hidden" id="cost" name="cost">
+                <input type="hidden" id="ownerID" name="ownerID" value={{owner._id}}>
+                    <div class="row left-align"> <button type="submit" class="btn btn-primary mb-2">BOOK NOW</button></div>
+        </form>
             </div>
-            <div class="row">
-                <div class="col"> </div>
-                <div class="col"> </div>
-                <div class="col"> </div>
-                <div class="col"> </div>
-                <div class="col"> <a href="/confirmation"> <button type="submit" class="btn btn-primary mb-2">BOOK
-                            NOW</button></a></div>
-            </div>
-        </div>
-        <h3>Entire Home hosted by Brooke</h3>
+        <h3>{{listing.type}} hosted by {{owner.fname}}</h3>
         <div class="card">
             <p>2 guests | 1 bedroom | 1 bed | 1 bath</p>
         </div>
         <div class="card">
             <h4>About the Place</h4>
-            <p>Newly renovated, 1-bedroom apartment in the heart of downtown Vancouver. </p>
-            <p>Enjoy a chef-level kitchen with all the equipment and appliances you need. Includes a private livingroom,
-                bathroom and bedroom. Close to many shops, cafes and public transit stops.</p>
+            {{{listing.description}}}
+            <br>
+            <p>Price: ${{listing.price}} per night</p>
         </div>
         <div class="card">
             <h4>Amenities</h4>
@@ -86,10 +82,33 @@
         </div>
         <div class="card"></div>
     </div>
-
-
-
     {{> footer}}
+    {{!-- for cost estimate --}}
+    <script>
+        function calculate(price) {
+            var start = new Date(document.getElementById('startDate').value);
+            var end = new Date(document.getElementById('endDate').value);
+            var days = (end - start) / (1000 * 60 * 60 * 24);
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2
+            })
+            if (start && end && days > 0) {
+                var accomodation = formatter.format(price * days);
+                document.getElementById('costEst').innerHTML = '<hr>Estimate for ' + days + ' nights: ' + accomodation;
+                document.getElementById('costEst').hidden = false;
+                document.getElementById('bookingStart').value = start;
+                document.getElementById('bookingEnd').value = end;
+                document.getElementById('stayLength').value = days;
+                document.getElementById('cost').value = accomodation;
+            }
+            else {
+                document.getElementById('costEst').innerHTML = '*Select other dates';
+                document.getElementById('costEst').hidden = false;
+            }
+        }
+    </script>
 </body>
 
 </html>

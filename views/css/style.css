@@ -175,10 +175,17 @@ ul{
 align-items: flex-end;
 margin-left: auto;
 }
+.left-align{
+flex-direction: row-reverse;
+}
+#costEst{
+  padding: 1em;
+}
+/* confirmation */
 .conBookMsg{
   padding: 1em;
   margin: .5em;
-  background-image: url("/static/images/info_pic5.jpg");
+  background-image: url("/images/info_pic5.jpg");
   background-color: white;
   background-repeat: no-repeat;
   background-size: auto 100%;
@@ -188,10 +195,18 @@ margin-left: auto;
   background-color: white;
   opacity: 0.7;
   border-radius: 5px;
-  max-width: 370px;
+  max-width: 475px;
   padding: 1em .75em;
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   color: black;
+}
+.tabletitle{
+  font-weight: bold;
+  width:200px;
+}
+.tabledata{
+  text-align: right;
+  width:250px;
 }
 /* login/register */
 .signup{
@@ -245,8 +260,9 @@ form.col .row{
   justify-content: flex-start;
   margin: auto;
 }
-.remove {
+.row.remove {
   position: absolute;
+  margin-left: 0;
 }
 .remove img {
   width:24px;

@@ -7,9 +7,9 @@ const BookingSchema = new Schema({
     "listingID": String,
     "startDate": Date,
     "endDate": Date,
-    "guests": Number,
+    "guests": {type: Number, default: 0},
     "length": Number,
-    "totalPrice": Number
+    "totalPrice": String
   });
 
   //returns
