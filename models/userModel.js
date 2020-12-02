@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 mongoose.Promise = require("bluebird");     //for asyncronous thread? to control promises?
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new Schema({
     "email": {
@@ -33,6 +34,26 @@ const UserSchema = new Schema({
       filename: String
     }]
   });
+
+UserSchema.pre('save', async function (next){
+  try{
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(this.pwd, salt);
+    this.pwd = hash;
+    next();
+  }catch(err){
+    next(err);
+  }
+});
+
+UserSchema.methods.validatePassword = function (password){
+  try{
+    return bcrypt.compare(password, this.pwd);
+  }
+catch(err){
+throw err;
+}
+}
 
   //returns
   module.exports = mongoose.model("Users", UserSchema);
