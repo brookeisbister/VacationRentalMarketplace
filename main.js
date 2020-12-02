@@ -102,6 +102,9 @@ app.get("/dashboard", checkLogin, (req, res) => {
         .then((user) => {
             if (user) {
                 var admin = (user.usertype == "admin");
+                if(user.favourites){
+                    var hasFavourites = !!(user.favourites.length);
+                }
                 user.createdOn = new Date(user.createdOn).toDateString();
                 listingModel.find({ userID: user.email }).lean()
                     .exec()
@@ -109,7 +112,7 @@ app.get("/dashboard", checkLogin, (req, res) => {
                         bookingModel.find({ guestID: user.email }).lean()
                             .exec()
                             .then((bookings) => {
-                                res.render('dashboard', { user: user, adminStatus: admin, bookings: bookings, hasBookings: !!bookings.length, listings: listings, hasListings: !!listings.length, layout: false });
+                                res.render('dashboard', { user: user, adminStatus: admin, hasFavourites: hasFavourites, bookings: bookings, hasBookings: !!bookings.length, listings: listings, hasListings: !!listings.length, layout: false });
                             });
                     });
             } else {
@@ -451,15 +454,35 @@ app.post("/create-booking", checkLogin, (req, res) => {
 
 })
 
-function sendMail()
-{
-    var a = document.getElementById('share');
-    a.href += document.URL;
-    console.log('in function share');
-    // var subject = document.getElementById("selectList").value
-    // var mail="mailto:chrisgreg23@googlemail.com?subject="+subject+"&body="+yourMessage;
+app.post("/add-to-favourites", checkLogin, (req, res) => {
+userModel.updateOne({_id: req.session.user.userID},
+    {
+        $push: { favourites:{id:req.body.listingID, title:req.body.title, filename:req.body.filename } } 
+    }
+    )
+    .exec()
+    .then(() => {
+        res.redirect("/dashboard");
+    }).catch((err) => {
+        res.redirect("/dashboard");
+        console.log(err);
+    });
+});
 
-    // window = window.open(mail, 'emailWindow')
-};
+app.post("/remove-favourite/:id", checkLogin, (req, res) => {
+    const favouriteID = req.params.id; 
+    userModel.updateOne({_id: req.session.user.userID},
+        {
+             $pull: { favourites: { _id: favouriteID } } 
+        }
+        )
+        .exec()
+        .then(() => {
+            res.redirect("/dashboard");
+        }).catch((err) => {
+            res.redirect("/dashboard");
+            console.log(err);
+        });
+});
 //listening on the port
 app.listen(HTTP_PORT, onHttpStart);
