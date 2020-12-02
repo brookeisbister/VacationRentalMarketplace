@@ -10,9 +10,10 @@ mongoose.Promise = require("bluebird");
 const clientsessions = require("client-sessions");
 const multer = require("multer");
 const fs = require("fs");
+const bcrypt = require('bcryptjs');
+require('dotenv').config();
 
 //connect to other documents
-const config = require("./js/config");
 const userModel = require("./models/userModel");
 const listingModel = require("./models/listingModel");
 const bookingModel = require("./models/bookingModel");
@@ -20,7 +21,7 @@ const PHOTODIRECTORY = "./public/photos/";
 
 //module initialization
 var HTTP_PORT = process.env.PORT || 8080;       //creating variable to designate a port if port isnt designated it sets it to 8080 
-const connectionString = config.dbconn;         //creating variableconnection string
+const connectionString = process.env.dbconn;    //creating variableconnection string
 app.use(express.static('./views/'));            //to serve static files
 app.use(express.static('./public/'));           //to serve static files
 app.engine('.hbs', hbs({ extname: '.hbs' }));   //Register handlebars as the rendering engine
@@ -31,14 +32,14 @@ app.use(bodyParser.urlencoded({ extended: true })); //middleware for “urlencod
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'seneca.brookeisbister@gmail.com',
-        pass: '2020web322'
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
     }
 });
 //configure cookie method for storing session information
 app.use(clientsessions({
     cookieName: "session",
-    secret: "web322_fall2020_brookeisbister_assignment",
+    secret: process.env.SECRET,
     duration: 1000 * 60 * 5,    //duration in milisec
     activeDuration: 1000 * 60 * 5
 }))
@@ -84,6 +85,7 @@ app.get("/", function (req, res) {
 });
 
 app.get("/login", function (req, res) {
+    req.session.reset();
     res.render('login', { user: req.session.user, layout: false });
 });
 
@@ -93,6 +95,7 @@ app.get("/logout", (req, res) => {
 })
 
 app.get("/userRegistration", function (req, res) {
+    req.session.reset();
     res.render('userRegistration', { user: req.session.user, layout: false });
 });
 
@@ -121,16 +124,21 @@ app.get("/dashboard", checkLogin, (req, res) => {
         })
 });
 
-app.get("/confirmation/:_id", function (req, res) {
+app.get("/confirmation/:_id", checkLogin, function (req, res) {
     const bookingID = req.params._id;
     bookingModel.findOne({ _id: bookingID }).lean()
         .exec()
         .then((booking) => {
-            booking.startDate = new Date(booking.startDate).toDateString();
-            booking.endDate = new Date(booking.endDate).toDateString()
-            res.render('confirmation', {
-                user: req.session.user, booking: booking, layout: false
-            });
+            if(booking.guestID==req.session.user.email){
+                booking.startDate = new Date(booking.startDate).toDateString();
+                booking.endDate = new Date(booking.endDate).toDateString()
+                res.render('confirmation', {
+                    user: req.session.user, booking: booking, layout: false
+                });
+            }else{
+                res.redirect('/dashboard');
+                console.log("User is not owner of booking");
+            }
         });
 });
 
@@ -178,8 +186,7 @@ app.get("/edit-details/:filename", checkLogin, (req, res) => {
                     }
                     else {
                         res.redirect('/dashboard');
-                        console.log(owner._id);
-                        console.log(req.session.user.userID);
+                        console.log("User is not owner of this listing");
                     }
                 })
         });
@@ -223,6 +230,7 @@ app.post("/login-for-process",
                     }
                 })
                 .catch((err) => {
+                    res.redirect('/');
                     console.log(`There was an error: ${err}`);
                 });
         }
@@ -268,7 +276,7 @@ app.post("/register-for-process",
                         res.redirect('/dashboard')
                             .then(() => {
                                 var emailOptions = {
-                                    from: 'seneca.brookeisbister@gmail.com',
+                                    from: process.env.MAIL_USER,
                                     to: newUserMetadata.email,
                                     subject: 'Welcome to AirB&B',
                                     html: '<p>Hello ' + newUserMetadata.fname + ' ' + newUserMetadata.lname + ',<br/><br/>Thank you for registering with us!<br/><br/><br/>Sincerely,<br/>Customer Support</p>'
@@ -278,6 +286,7 @@ app.post("/register-for-process",
                                 })
                             })
                             .catch((err) => {
+                                res.redirect('/dashboard');
                                 if (err) { console.log("ERROR: " + err); }
                             })
                     }
@@ -286,7 +295,7 @@ app.post("/register-for-process",
                     if (err.code === 11000) {
                         return res.render("userRegistration", { errmsg: "*email already registered", inputUser: regInfo, layout: false });
                     } else {
-                        console.log(err);
+                        console.log("Error: "+err);
                         return res.render("userRegistration", { errmsg: "*There was an error registering", inputUser: regInfo, layout: false });
                     }
                 });
@@ -295,7 +304,7 @@ app.post("/register-for-process",
         }
     });
 
-app.post("/add-listing", upload.single("photo"), (req, res) => {
+app.post("/add-listing", upload.single("photo"), checkLogin, (req, res) => {
     const listingMetadata = new listingModel({
         userID: req.session.user.email,
         type: req.body.type,
@@ -312,15 +321,16 @@ app.post("/add-listing", upload.single("photo"), (req, res) => {
         })
         .catch((err) => {
             if (err.code === 11000) {
-                res.send(err);
+                console.log("Error: "+err);
+                res.redirect("/dashboard");
             } else {
-                console.log(err);
+                console.log("Error: "+err);
                 res.redirect("/dashboard");
             }
         });
 });
 
-app.post("/remove-listing/:filename", (req, res) => {
+app.post("/remove-listing/:filename", checkLogin, (req, res) => {
     const filename = req.params.filename;   // req.params holds the dynamic parameters of a url
     // remove the photo
     listingModel.remove({ filename: filename })
@@ -328,26 +338,25 @@ app.post("/remove-listing/:filename", (req, res) => {
             // now remove the file from the file system.
             fs.unlink(PHOTODIRECTORY + filename, (err) => {
                 if (err) {
-                    return console.log(err);
+                    return console.log("Error: "+err);
                 }
                 console.log("Removed file : " + filename);
             });
             // redirect to home page once the removal is done.
             res.redirect("/dashboard");
         }).catch((err) => {
-            console.log(err);
+            console.log("Error: "+err);
             res.redirect("/dashboard");
         });
 });
 
-app.post("/edit-listing/:filename", upload.single("photo"), (req, res) => {
-    const filename = req.params.filename;   // req.params holds the dynamic parameters of a url
+app.post("/edit-listing/:filename", upload.single("photo"), checkLogin, (req, res) => {
+    const filename = req.params.filename; 
     const updated = req.body;
-    //res.send(req.file);
     if (req.file) {
         fs.unlink(PHOTODIRECTORY + filename, (err) => {
             if (err) {
-                return console.log(err);
+                return console.log("Error: "+err);
             }
             console.log("Removed file : " + filename);
         });
@@ -366,7 +375,7 @@ app.post("/edit-listing/:filename", upload.single("photo"), (req, res) => {
             .then(() => {
                 res.redirect("/dashboard");
             }).catch((err) => {
-                console.log(err);
+                console.log("Error: "+err);
                 res.redirect("/dashboard");
             });
     }
@@ -386,18 +395,13 @@ app.post("/edit-listing/:filename", upload.single("photo"), (req, res) => {
             .then(() => {
                 res.redirect("/dashboard");
             }).catch((err) => {
-                console.log(err);
+                console.log("Error: "+err);
                 res.redirect("/dashboard");
             });
     }
 });
 
 app.post("/create-booking", checkLogin, (req, res) => {
-    // //delete testing bookings - remove later
-    // bookingModel.deleteMany({}).exec().then((result, err) => {
-    //     console.log(result);
-    //     console.log(err);
-    // });
     const bookingInfo = req.body;
     userModel.findOne({ _id: req.session.user.userID }).lean()
         .exec()
@@ -417,7 +421,7 @@ app.post("/create-booking", checkLogin, (req, res) => {
                         res.redirect('/confirmation/' + booking._id)
                         //send confirmation email
                         var emailOptions = {
-                            from: 'seneca.brookeisbister@gmail.com',
+                            from: process.env.MAIL_USER,
                             to: newBookingMetadata.guestID,
                             subject: 'AirB&B Booking Confirmation',
                             html: `<p>Hello ${guest.fname} ${guest.lname},</p><p>Your reservation is confirmed. Thank you!</p><p><strong>Booking Details</strong></p><p style="padding-left: 40px;"><strong>Confirmation Code:</strong> ${booking._id}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-in:</strong> ${booking.startDate}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-out:</strong> ${booking.endDate}</p><p style="padding-left: 40px;"><strong>Total:</strong> ${booking.totalPrice}</p><p>&nbsp;</p><p>Enjoy your stay,</p><p>Customer Support</p>`
@@ -430,21 +434,19 @@ app.post("/create-booking", checkLogin, (req, res) => {
                             { email: newBookingMetadata.guestID },
                             { $inc: { trips: 1 } }
                         ).exec().then((result, err) => {
-                            // console.log(result);
-                            // console.log(err);
+                            if(err){console.log("Error: "+err);} 
                         });
                         //update owner visit stat
                         userModel.updateOne(
                             { _id: bookingInfo.ownerID },
                             { $inc: { visits: 1 } }
                         ).exec().then((result, err) => {
-                            // console.log(result);
-                            // console.log(err);
+                            if(err){console.log("Error: "+err);} 
                         });
 
                     })
                     .catch((err) => {
-                        console.log(err);
+                        console.log("Error: "+err);
                         res.redirect('/details/' + bookingInfo.listingID);
                     });
             } else {
@@ -465,7 +467,7 @@ userModel.updateOne({_id: req.session.user.userID},
         res.redirect("/dashboard");
     }).catch((err) => {
         res.redirect("/dashboard");
-        console.log(err);
+        console.log("Error: "+err);
     });
 });
 
@@ -481,7 +483,7 @@ app.post("/remove-favourite/:id", checkLogin, (req, res) => {
             res.redirect("/dashboard");
         }).catch((err) => {
             res.redirect("/dashboard");
-            console.log(err);
+            console.log("Error: "+err);
         });
 });
 //listening on the port
