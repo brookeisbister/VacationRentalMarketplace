@@ -52,17 +52,31 @@
     </div>
     <div class="card">
       <h4>Your Favourites</h4>
- {{#if hasFavourites}}
-      <div class="uploadResults">
-        {{#each listings}}
+      {{#if hasFavourites}}
+      {{!-- <table>
+        {{#each user.favourites}}
+        <tr>
+          <td>
+            <form class="remove" title="Remove photo" action="/remove-favourite/{{_id}}" method="post">
+              <button type="submit" class="btn btn-primary mb-2">
+                <img src="/images/trash_can.png" width="10" />
+              </button>
+            </form>
+          </td>
+          <td>
+            <a href="/details/{{id}}">{{title}}</a>
+          </td>
+        </tr>
+        {{/each}}
+      </table> --}}
+
+ <div class="uploadResults">
+        {{#each user.favourites}}
         <div class="listing">
-          <img src="photos/{{this.filename}}" />
-          <p>
-            <b>{{this.title}}</b> <br> {{this.city}} <br>{{this.type}} <br> ${{this.price}} CAD/night<br><br>
-            {{{this.description}}}
-          </p>
+          <img src="photos/{{filename}}"/>
+          <a href="/details/{{id}}">{{title}}</a>
           <div class="row remove">
-            <form class="remove" title="Remove photo" action="/remove-favourite/{{this.filename}}" method="post">
+            <form class="remove" title="Remove photo" action="/remove-favourite/{{_id}}" method="post">
               <button type="submit" class="btn btn-primary mb-2">
                 <img src="/images/trash_can.png" width="10" />
               </button>
@@ -71,6 +85,7 @@
         </div>
         {{/each}}
       </div>
+
       {{else}}
       <ul>
         <li>No favourites</li>

@@ -11,9 +11,13 @@
         <div class="card">
             <div class="row">
                 <p class="col">{{listing.city}}, Canada</p>
-                <button type="button" class="btn btn-primary mb-2">Add to Favourites</button>
-                <a id="share" href=""><button type="button" class="btn btn-primary mb-2"
-                        onclick="sendMail()">SHARE</button></a>
+                <form action="/add-to-favourites" method="POST">
+                <input type="hidden" id="listingID" name="listingID" value={{listing._id}}>
+                <input type="hidden" id="title" name="title" value="{{{listing.title}}}">
+                <input type="hidden" id="filename" name="filename" value="{{listing.filename}}">
+                <button type="submit" class="btn btn-primary mb-2">Add to Favourites</button>
+                </form>
+                <a id="share" href=""><button type="button" class="btn btn-primary mb-2" onclick="sendMail()">SHARE</button></a>
             </div>
         </div>
         <div class="previewpics">

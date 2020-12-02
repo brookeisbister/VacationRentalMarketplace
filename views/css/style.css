@@ -259,6 +259,7 @@ form.col .row{
   flex-direction: row;
   justify-content: flex-start;
   margin: auto;
+  flex-wrap: wrap;
 }
 .row.remove {
   position: absolute;

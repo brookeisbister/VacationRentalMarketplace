@@ -26,7 +26,12 @@ const UserSchema = new Schema({
     "visits":{
       type: Number,
       default: 0
-    }
+    },
+    "favourites": [{
+      id: String,
+      title: String,
+      filename: String
+    }]
   });
 
   //returns
