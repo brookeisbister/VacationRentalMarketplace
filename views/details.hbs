@@ -12,7 +12,8 @@
             <div class="row">
                 <p class="col">{{listing.city}}, Canada</p>
                 <button type="button" class="btn btn-primary mb-2">Add to Favourites</button>
-                <button type="button" class="btn btn-primary mb-2">SHARE</button>
+                <a id="share" href=""><button type="button" class="btn btn-primary mb-2"
+                        onclick="sendMail()">SHARE</button></a>
             </div>
         </div>
         <div class="previewpics">
@@ -30,8 +31,8 @@
                 </div>
             </div>
         </div>
-            <div class="promo" id="booknow">
-        <form action="/create-booking" method="POST">
+        <div class="promo" id="booknow">
+            <form action="/create-booking" method="POST">
                 <div class="row">
                     <div class="col label"><label for="startDate">CHECK-IN</label></div>
                     <div class="col option">
@@ -39,7 +40,8 @@
                     </div>
                     <div class="col label"><label for="endDate">CHECKOUT</label></div>
                     <div class="col option" style="margin-right: 1em;">
-                        <input type="date" class="form-control" id="endDate" oninput="calculate({{listing.price}})" required>
+                        <input type="date" class="form-control" id="endDate" oninput="calculate({{listing.price}})"
+                            required>
                     </div>
                 </div>
                 <div class="row left-align">
@@ -51,9 +53,9 @@
                 <input type="hidden" id="stayLength" name="stayLength">
                 <input type="hidden" id="cost" name="cost">
                 <input type="hidden" id="ownerID" name="ownerID" value={{owner._id}}>
-                    <div class="row left-align"> <button type="submit" class="btn btn-primary mb-2">BOOK NOW</button></div>
-        </form>
-            </div>
+                <div class="row left-align"> <button type="submit" class="btn btn-primary mb-2">BOOK NOW</button></div>
+            </form>
+        </div>
         <h3>{{listing.type}} hosted by {{owner.fname}}</h3>
         <div class="card">
             <p>2 guests | 1 bedroom | 1 bed | 1 bath</p>
@@ -108,6 +110,13 @@
                 document.getElementById('costEst').hidden = false;
             }
         }
+    </script>
+    {{!-- for share --}}
+    <script>
+        function sendMail() {
+            var a = document.getElementById('share');
+            a.href = "mailto:?subject={{{listing.title}}}%20AirBnB%20&body=" + document.URL;
+        };
     </script>
 </body>
 

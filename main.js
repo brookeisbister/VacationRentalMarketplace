@@ -1,10 +1,10 @@
 //express web server set-up
-const express = require("express");               //requiring express module
-const app = express();                            //instance of executed express module
+const express = require("express");
+const app = express();
 const path = require("path");
 const hbs = require('express-handlebars');
 const bodyParser = require('body-parser');
-var nodemailer = require('nodemailer');            //for email
+var nodemailer = require('nodemailer');
 const mongoose = require("mongoose");
 mongoose.Promise = require("bluebird");
 const clientsessions = require("client-sessions");
@@ -42,8 +42,7 @@ app.use(clientsessions({
     duration: 1000 * 60 * 5,    //duration in milisec
     activeDuration: 1000 * 60 * 5
 }))
-// make sure the photos folder exists
-// if not create it
+// make sure the photos folder exists if not create it
 if (!fs.existsSync(PHOTODIRECTORY)) {
     fs.mkdirSync(PHOTODIRECTORY);
 }
@@ -77,7 +76,7 @@ mongoose.connection.on("open", () => {
     console.log("Database connection open.");
 });
 
-// //navigation
+//GET navigation
 app.get("/", function (req, res) {
     res.render('home', {
         user: req.session.user, layout: false
@@ -98,30 +97,25 @@ app.get("/userRegistration", function (req, res) {
 });
 
 app.get("/dashboard", checkLogin, (req, res) => {
-    userModel.findOne({_id: req.session.user.userID}).lean()
-    .exec()
-    .then((user)=>{
-    if (user) {
-        var admin = (user.usertype == "admin");
-        user.createdOn = new Date(user.createdOn).toDateString();
-        listingModel.find({ userID: user.email }).lean()
-            .exec()
-            .then((listings) => {
-                bookingModel.find({ guestID: user.email }).lean()
-                .exec()
-                .then((bookings) => {
-                    res.render('dashboard', { user: user, adminStatus: admin, bookings: bookings, hasBookings: !!bookings.length, listings: listings, hasListings: !!listings.length, layout: false });
-                });
-            });
-    } else {
-        res.render('dashboard', { user: req.session.user, layout: false });
-    }
-    })
-
-});
-
-app.get("/details", function (req, res) {
-    res.render('details', { user: req.session.user, layout: false });
+    userModel.findOne({ _id: req.session.user.userID }).lean()
+        .exec()
+        .then((user) => {
+            if (user) {
+                var admin = (user.usertype == "admin");
+                user.createdOn = new Date(user.createdOn).toDateString();
+                listingModel.find({ userID: user.email }).lean()
+                    .exec()
+                    .then((listings) => {
+                        bookingModel.find({ guestID: user.email }).lean()
+                            .exec()
+                            .then((bookings) => {
+                                res.render('dashboard', { user: user, adminStatus: admin, bookings: bookings, hasBookings: !!bookings.length, listings: listings, hasListings: !!listings.length, layout: false });
+                            });
+                    });
+            } else {
+                res.render('dashboard', { user: req.session.user, layout: false });
+            }
+        })
 });
 
 app.get("/confirmation/:_id", function (req, res) {
@@ -136,6 +130,58 @@ app.get("/confirmation/:_id", function (req, res) {
             });
         });
 });
+
+app.get("/search-results", (req, res) => {
+    const location = req.query.searchLocation;
+    if (location == "Anywhere...") {
+        listingModel.find().lean()                 //retrieve all documents and convert mongoose document to javascript object
+            .exec()                             //format to promise
+            .then((listings) => {
+                res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
+            });
+    } else {
+        listingModel.find({ city: location }).lean()                 //retrieve all documents and convert mongoose document to javascript object
+            .exec()                             //format to promise
+            .then((listings) => {
+                res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
+            });
+    }
+
+})
+
+app.get("/details/:_id", (req, res) => {
+    const listingID = req.params._id;
+    listingModel.findOne({ _id: listingID }).lean()
+        .exec()
+        .then((listing) => {
+            userModel.findOne({ email: listing.userID }).lean()
+                .exec()
+                .then((owner) => {
+                    return res.render('details', { user: req.session.user, listing: listing, owner: owner, layout: false });
+                })
+        });
+})
+
+app.get("/edit-details/:filename", checkLogin, (req, res) => {
+    const filename = req.params.filename;
+    listingModel.findOne({ filename: filename }).lean()
+        .exec()
+        .then((listing) => {
+            userModel.findOne({ email: listing.userID }).lean()
+                .exec()
+                .then((owner) => {
+                    if (owner._id == req.session.user.userID) {
+                        return res.render('edit-details', { user: req.session.user, listing: listing, owner: owner, layout: false });
+                    }
+                    else {
+                        res.redirect('/dashboard');
+                        console.log(owner._id);
+                        console.log(req.session.user.userID);
+                    }
+                })
+        });
+})
+
 //socials
 app.get("https:www.instagram.com", function (req, res) {
     res.redirect('https:www.instagram.com');
@@ -146,7 +192,7 @@ app.get("https:www.facebook.com", function (req, res) {
 app.get("https:www.twitter.com", function (req, res) {
     res.redirect('https:www.twitter.com');
 });
-//forms
+//POST navigation
 app.post("/login-for-process",
     (req, res) => {
         const loginInfo = req.body;
@@ -165,7 +211,7 @@ app.post("/login-for-process",
                         if (user.pwd == loginpwd) {
                             req.session.user = {
                                 userID: user._id,
-                                fname: user.fname
+                                email: user.email
                             };
                             res.redirect("/dashboard");
                         } else {
@@ -213,8 +259,8 @@ app.post("/register-for-process",
                 .then((user) => {
                     if (!user) {
                         req.session.user = {
-                                userID: user._id,
-                                fname: user.fname
+                            userID: user._id,
+                            email: user.email
                         };
                         res.redirect('/dashboard')
                             .then(() => {
@@ -273,7 +319,6 @@ app.post("/add-listing", upload.single("photo"), (req, res) => {
 
 app.post("/remove-listing/:filename", (req, res) => {
     const filename = req.params.filename;   // req.params holds the dynamic parameters of a url
-
     // remove the photo
     listingModel.remove({ filename: filename })
         .then(() => {
@@ -286,58 +331,63 @@ app.post("/remove-listing/:filename", (req, res) => {
             });
             // redirect to home page once the removal is done.
             res.redirect("/dashboard");
-            //res.render('dashboard', { user: req.session.user, adminStatus: admin, editmsg: "Listing removed", listings: listings, hasListings: !!listings.length, layout: false });
         }).catch((err) => {
-            // if there was an error removing the photo, log it, and redirect.
             console.log(err);
             res.redirect("/dashboard");
-            //res.render('dashboard', { user: req.session.user, adminStatus: admin, editmsg: "Error removing listing", listings: listings, hasListings: !!listings.length, layout: false });
         });
 });
 
-app.post("/edit-listing/:filename", (req, res) => {
+app.post("/edit-listing/:filename", upload.single("photo"), (req, res) => {
     const filename = req.params.filename;   // req.params holds the dynamic parameters of a url
-
-    listingModel.updateOne({ filename: filename })
-        .then(() => {
-
-        }).catch((err) => {
-            console.log(err);
-            res.redirect("/dashboard");
-
+    const updated = req.body;
+    //res.send(req.file);
+    if (req.file) {
+        fs.unlink(PHOTODIRECTORY + filename, (err) => {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("Removed file : " + filename);
         });
-});
-
-app.get("/search-results", (req, res) => {
-    const location = req.query.searchLocation;
-    if (location == "Anywhere...") {
-        listingModel.find().lean()                 //retrieve all documents and convert mongoose document to javascript object
-            .exec()                             //format to promise
-            .then((listings) => {
-                res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
-            });
-    } else {
-        listingModel.find({ city: location }).lean()                 //retrieve all documents and convert mongoose document to javascript object
-            .exec()                             //format to promise
-            .then((listings) => {
-                res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
+        listingModel.updateOne(
+            { filename: filename },
+            {
+                $set: {
+                    filename: req.file.filename,
+                    title: updated.title,
+                    description: updated.description,
+                    price: updated.price,
+                    city: updated.city
+                }
+            }
+        ).exec()
+            .then(() => {
+                res.redirect("/dashboard");
+            }).catch((err) => {
+                console.log(err);
+                res.redirect("/dashboard");
             });
     }
-
-})
-
-app.get("/details/:_id", (req, res) => {
-    const listingID = req.params._id;
-    listingModel.findOne({ _id: listingID }).lean()
-        .exec()
-        .then((listing) => {
-            userModel.findOne({ email: listing.userID }).lean()
-                .exec()
-                .then((owner) => {
-                    return res.render('details', { user: req.session.user, listing: listing, owner: owner, layout: false });
-                })
-        });
-})
+    else {
+        listingModel.updateOne(
+            { filename: filename },
+            {
+                $set: {
+                    type: updated.type,
+                    title: updated.title,
+                    description: updated.description,
+                    price: updated.price,
+                    city: updated.city
+                }
+            }
+        ).exec()
+            .then(() => {
+                res.redirect("/dashboard");
+            }).catch((err) => {
+                console.log(err);
+                res.redirect("/dashboard");
+            });
+    }
+});
 
 app.post("/create-booking", checkLogin, (req, res) => {
     // //delete testing bookings - remove later
@@ -346,60 +396,70 @@ app.post("/create-booking", checkLogin, (req, res) => {
     //     console.log(err);
     // });
     const bookingInfo = req.body;
-    userModel.findOne({_id: req.session.user.userID}).lean()
-    .exec()
-    .then((guest)=>{
-         if (bookingInfo.bookingStart && bookingInfo.bookingEnd) {
-        const newBookingMetadata = new bookingModel({
-            "guestID": guest.email,
-            "listingID": bookingInfo.listingID,
-            "startDate": bookingInfo.bookingStart,
-            "endDate": bookingInfo.bookingEnd,
-            "length": bookingInfo.stayLength,
-            "totalPrice": bookingInfo.cost
-        });
-        newBookingMetadata.save()
-            .then((booking) => {
-                //go to confirmation page
-                res.redirect('/confirmation/' + booking._id)
-                //send confirmation email
-                var emailOptions = {
-                    from: 'seneca.brookeisbister@gmail.com',
-                    to: newBookingMetadata.guestID,
-                    subject: 'AirB&B Booking Confirmation',
-                    html:  `<p>Hello ${guest.fname} ${guest.lname},</p><p>Your reservation is confirmed. Thank you!</p><p><strong>Booking Details</strong></p><p style="padding-left: 40px;"><strong>Confirmation Code:</strong> ${booking._id}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-in:</strong> ${booking.startDate}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-out:</strong> ${booking.endDate}</p><p style="padding-left: 40px;"><strong>Total:</strong> ${booking.totalPrice}</p><p>&nbsp;</p><p>Enjoy your stay,</p><p>Customer Support</p>`
-                };
-                transporter.sendMail(emailOptions, (info, error) => {
-                    console.log("Success: " + info.response);
-                })
-                //update guest trip stat
-                userModel.updateOne(
-                    { email: newBookingMetadata.guestID },
-                    { $inc: { trips: 1 } }
-                ).exec().then((result, err) => {
-                    // console.log(result);
-                    // console.log(err);
+    userModel.findOne({ _id: req.session.user.userID }).lean()
+        .exec()
+        .then((guest) => {
+            if (bookingInfo.bookingStart && bookingInfo.bookingEnd) {
+                const newBookingMetadata = new bookingModel({
+                    "guestID": guest.email,
+                    "listingID": bookingInfo.listingID,
+                    "startDate": bookingInfo.bookingStart,
+                    "endDate": bookingInfo.bookingEnd,
+                    "length": bookingInfo.stayLength,
+                    "totalPrice": bookingInfo.cost
                 });
-                //update owner visit stat
-                userModel.updateOne(
-                    { _id: bookingInfo.ownerID },
-                    { $inc: { visits: 1 } }
-                ).exec().then((result, err) => {
-                    // console.log(result);
-                    // console.log(err);
-                });
+                newBookingMetadata.save()
+                    .then((booking) => {
+                        //go to confirmation page
+                        res.redirect('/confirmation/' + booking._id)
+                        //send confirmation email
+                        var emailOptions = {
+                            from: 'seneca.brookeisbister@gmail.com',
+                            to: newBookingMetadata.guestID,
+                            subject: 'AirB&B Booking Confirmation',
+                            html: `<p>Hello ${guest.fname} ${guest.lname},</p><p>Your reservation is confirmed. Thank you!</p><p><strong>Booking Details</strong></p><p style="padding-left: 40px;"><strong>Confirmation Code:</strong> ${booking._id}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-in:</strong> ${booking.startDate}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-out:</strong> ${booking.endDate}</p><p style="padding-left: 40px;"><strong>Total:</strong> ${booking.totalPrice}</p><p>&nbsp;</p><p>Enjoy your stay,</p><p>Customer Support</p>`
+                        };
+                        transporter.sendMail(emailOptions, (info, error) => {
+                            console.log("Success: " + info.response);
+                        })
+                        //update guest trip stat
+                        userModel.updateOne(
+                            { email: newBookingMetadata.guestID },
+                            { $inc: { trips: 1 } }
+                        ).exec().then((result, err) => {
+                            // console.log(result);
+                            // console.log(err);
+                        });
+                        //update owner visit stat
+                        userModel.updateOne(
+                            { _id: bookingInfo.ownerID },
+                            { $inc: { visits: 1 } }
+                        ).exec().then((result, err) => {
+                            // console.log(result);
+                            // console.log(err);
+                        });
 
-            })
-            .catch((err) => {
-                console.log(err);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.redirect('/details/' + bookingInfo.listingID);
+                    });
+            } else {
                 res.redirect('/details/' + bookingInfo.listingID);
-            });
-    } else {
-        res.redirect('/details/' + bookingInfo.listingID);
-    }
-    })
-   
+            }
+        })
+
 })
 
+function sendMail()
+{
+    var a = document.getElementById('share');
+    a.href += document.URL;
+    console.log('in function share');
+    // var subject = document.getElementById("selectList").value
+    // var mail="mailto:chrisgreg23@googlemail.com?subject="+subject+"&body="+yourMessage;
+
+    // window = window.open(mail, 'emailWindow')
+};
 //listening on the port
 app.listen(HTTP_PORT, onHttpStart);
