@@ -192,14 +192,14 @@ app.get("/edit-details/:filename", checkLogin, (req, res) => {
 })
 
 //socials
-app.get("/https:www.instagram.com", function (req, res) {
-    res.redirect('https:www.instagram.com');
+app.get("/instagram", function (req, res) {
+    res.redirect('https://www.instagram.com/');
 });
-app.get("/https:www.facebook.com", function (req, res) {
-    res.redirect('https:www.facebook.com');
+app.get("/facebook", function (req, res) {
+    res.redirect('https://www.facebook.com');
 });
-app.get("/https:www.twitter.com", function (req, res) {
-    res.redirect('https:www.twitter.com');
+app.get("/twitter", function (req, res) {
+    res.redirect('https://www.twitter.com');
 });
 //POST navigation
 app.post("/login-for-process",
