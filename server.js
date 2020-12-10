@@ -10,7 +10,7 @@ mongoose.Promise = require("bluebird");
 const clientsessions = require("client-sessions");
 const multer = require("multer");
 const fs = require("fs");
-const sgMail = require('@sendgrid/mail')
+const sgMail = require('@sendgrid/mail');
 require('dotenv').config();
 
 //connect to other documents
@@ -31,14 +31,14 @@ app.set('view engine', '.hbs');                 //Register handlebars as the ren
 app.use(bodyParser.urlencoded({ extended: true })); //middleware for “urlencoded” form data
 
 //email setup
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-// var transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//         user: process.env.MAIL_USER,
-//         pass: process.env.MAIL_PASS
-//     }
-// });
+//sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+    }
+});
 
 //configure cookie method for storing session information
 app.use(clientsessions({
@@ -429,27 +429,27 @@ app.post("/create-booking", checkLogin, (req, res) => {
                         //go to confirmation page
                         res.redirect('/confirmation/' + booking._id);
                         //send confirmation email
-                        var emailOptions = {
+                        const emailOptions = {
                             from: process.env.MAIL_USER,
                             to: newBookingMetadata.guestID,
                             subject: 'AirB&B Booking Confirmation',
                             html: `<p>Hello ${guest.fname} ${guest.lname},</p><p>Your reservation is confirmed. Thank you!</p><p><strong>Booking Details</strong></p><p style="padding-left: 40px;"><strong>Confirmation Code:</strong> ${booking._id}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-in:</strong> ${booking.startDate}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-out:</strong> ${booking.endDate}</p><p style="padding-left: 40px;"><strong>Total:</strong> ${booking.totalPrice}</p><p>&nbsp;</p><p>Enjoy your stay,</p><p>Customer Support</p>`
                         };
-                        sgMail
-                            .send(emailOptions)
-                            .then(() => {
-                                console.log('Email sent')
-                            })
-                            .catch((error) => {
-                                console.error(error)
-                            });
-                        // transporter.sendMail(emailOptions, (error, info) => {
-                        //     if (error) {
-                        //         console.log("ERROR: " + error);
-                        //     } else {
-                        //         console.log("Success: " + info.response);
-                        //     }
-                        // });
+                        // sgMail
+                        //     .send(emailOptions)
+                        //     .then(() => {
+                        //         console.log('Email sent')
+                        //     })
+                        //     .catch((error) => {
+                        //         console.error(error)
+                        //     });
+                        transporter.sendMail(emailOptions, (error, info) => {
+                            if (error) {
+                                console.log("ERROR: " + error);
+                            } else {
+                                console.log("Success: " + info.response);
+                            }
+                        });
                         //update guest trip stat
                         userModel.updateOne(
                             { email: newBookingMetadata.guestID },
