@@ -21,6 +21,7 @@ const PHOTODIRECTORY = "./public/photos/";
 
 //module initialization
 var HTTP_PORT = process.env.PORT || 8080;       //creating variable to designate a port if port isnt designated it sets it to 8080 
+const uri = process.env.MONGODB_URI;
 const connectionString = process.env.dbconn;    //creating variableconnection string
 app.use(express.static('./views/'));            //to serve static files
 app.use(express.static('./public/'));           //to serve static files
