@@ -62,6 +62,11 @@ const upload = multer({ storage: storage });  // tell multer to use the diskStor
 //startup function
 function onHttpStart() {
     console.log("Express http server listening on: " + HTTP_PORT);
+    //connect to mongoDB database
+    mongoose.connect(connectionString, { useCreateIndex: true, useNewUrlParser: true, useUnifiedTopology: true });
+    mongoose.connection.on("open", () => {
+        console.log("Database connection open.");
+    });
 };
 //check login function
 function checkLogin(req, res, next) {
@@ -71,11 +76,6 @@ function checkLogin(req, res, next) {
         next(); //exit function
     }
 };
-//connect to mongoDB database
-mongoose.connect(connectionString, { useCreateIndex: true, useNewUrlParser: true, useUnifiedTopology: true });
-mongoose.connection.on("open", () => {
-    console.log("Database connection open.");
-});
 
 //GET navigation
 app.get("/", function (req, res) {
