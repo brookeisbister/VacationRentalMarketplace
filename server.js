@@ -157,7 +157,6 @@ app.get("/search-results", (req, res) => {
                 res.render('searchResults', { user: req.session.user, listings: listings, hasListings: !!listings.length, layout: false });
             });
     }
-
 })
 
 app.get("/details/:_id", (req, res) => {
