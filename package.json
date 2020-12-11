@@ -4,7 +4,6 @@
   "description": "Assignment 1 out of 6 for Web 322",
   "main": "server.js",
   "dependencies": {
-    "@sendgrid/mail": "^7.4.0",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",

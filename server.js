@@ -4,13 +4,12 @@ const app = express();
 const path = require("path");
 const hbs = require('express-handlebars');
 const bodyParser = require('body-parser');
-var nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const mongoose = require("mongoose");
 mongoose.Promise = require("bluebird");
 const clientsessions = require("client-sessions");
 const multer = require("multer");
 const fs = require("fs");
-const sgMail = require('@sendgrid/mail');
 require('dotenv').config();
 
 //connect to other documents
@@ -31,7 +30,6 @@ app.set('view engine', '.hbs');                 //Register handlebars as the ren
 app.use(bodyParser.urlencoded({ extended: true })); //middleware for “urlencoded” form data
 
 //email setup
-//sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -435,44 +433,37 @@ app.post("/create-booking", checkLogin, (req, res) => {
                             subject: 'AirB&B Booking Confirmation',
                             html: `<p>Hello ${guest.fname} ${guest.lname},</p><p>Your reservation is confirmed. Thank you!</p><p><strong>Booking Details</strong></p><p style="padding-left: 40px;"><strong>Confirmation Code:</strong> ${booking._id}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-in:</strong> ${booking.startDate}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-out:</strong> ${booking.endDate}</p><p style="padding-left: 40px;"><strong>Total:</strong> ${booking.totalPrice}</p><p>&nbsp;</p><p>Enjoy your stay,</p><p>Customer Support</p>`
                         };
-                        // sgMail
-                        //     .send(emailOptions)
-                        //     .then(() => {
-                        //         console.log('Email sent')
-                        //     })
-                        //     .catch((error) => {
-                        //         console.error(error)
-                        //     });
                         transporter.sendMail(emailOptions, (error, info) => {
                             if (error) {
-                                console.log("ERROR: " + error);
-                            } else {
-                                console.log("Success: " + info.response);
-                            }
-                        });
-                        //update guest trip stat
-                        userModel.updateOne(
-                            { email: newBookingMetadata.guestID },
-                            { $inc: { trips: 1 } }
-                        ).exec().then((result, err) => {
-                            if (err) { console.log("Error: " + err); }
-                        });
-                        //update owner visit stat
-                        userModel.updateOne(
-                            { _id: bookingInfo.ownerID },
-                            { $inc: { visits: 1 } }
-                        ).exec().then((result, err) => {
-                            if (err) { console.log("Error: " + err); }
-                        });
 
+                                    console.log("ERROR: " + error)	                                              
+                                } else { 
+                                    console.log("Success: " + info.response); 
+                                }
                     })
-                    .catch((err) => {
-                        console.log("Error: " + err);
-                        res.redirect('/details/' + bookingInfo.listingID);
-                    });
-            } else {
-                res.redirect('/details/' + bookingInfo.listingID);
-            }
+                //update guest trip stat
+                userModel.updateOne(
+                    { email: newBookingMetadata.guestID },
+                    { $inc: { trips: 1 } }
+                ).exec().then((result, err) => {
+                    if (err) { console.log("Error: " + err); }
+                });
+                //update owner visit stat
+                userModel.updateOne(
+                    { _id: bookingInfo.ownerID },
+                    { $inc: { visits: 1 } }
+                ).exec().then((result, err) => {
+                    if (err) { console.log("Error: " + err); }
+                });
+
+            })
+        .catch((err) => {
+            console.log("Error: " + err);
+            res.redirect('/details/' + bookingInfo.listingID);
+        });
+} else {
+    res.redirect('/details/' + bookingInfo.listingID);
+}
         })
 
 })
