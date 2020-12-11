@@ -31,18 +31,18 @@ app.set('view engine', '.hbs');                 //Register handlebars as the ren
 app.use(bodyParser.urlencoded({ extended: true })); //middleware for “urlencoded” form data
 
 //email setup
-// var transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//         user: process.env.MAIL_USER,
-//         pass: process.env.MAIL_PASS
-//     }
-// });
-const transporter = nodemailer.createTransport(sgTransport({
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
     auth: {
-        api_key: process.env.SENDGRID_API_KEY // your api key here, better hide it in env vars
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
     }
-}))
+});
+// const transporter = nodemailer.createTransport(sgTransport({
+//     auth: {
+//         api_key: process.env.SENDGRID_API_KEY // your api key here, better hide it in env vars
+//     }
+// }))
 
 
 //configure cookie method for storing session information
