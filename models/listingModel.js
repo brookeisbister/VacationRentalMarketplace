@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-mongoose.Promise = require("bluebird");     //for asyncronous thread? to control promises?
+mongoose.Promise = require("bluebird");
 const Schema = mongoose.Schema;
 
 const ListingSchema = new Schema({

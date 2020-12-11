@@ -53,23 +53,6 @@
     <div class="card">
       <h4>Your Favourites</h4>
       {{#if hasFavourites}}
-      {{!-- <table>
-        {{#each user.favourites}}
-        <tr>
-          <td>
-            <form class="remove" title="Remove photo" action="/remove-favourite/{{_id}}" method="post">
-              <button type="submit" class="btn btn-primary mb-2">
-                <img src="/images/trash_can.png" width="10" />
-              </button>
-            </form>
-          </td>
-          <td>
-            <a href="/details/{{id}}">{{title}}</a>
-          </td>
-        </tr>
-        {{/each}}
-      </table> --}}
-
  <div class="uploadResults">
         {{#each user.favourites}}
         <div class="listing">
@@ -92,7 +75,6 @@
       </ul>
       {{/if}}
     </div>
-
     {{#if adminStatus}}
     <div class="card">
       <h4>Your Listings</h4>

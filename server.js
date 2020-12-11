@@ -38,6 +38,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.MAIL_PASS
     }
 });
+//sendgrid was not consistently working
 // const transporter = nodemailer.createTransport(sgTransport({
 //     auth: {
 //         api_key: process.env.SENDGRID_API_KEY // your api key here, better hide it in env vars
@@ -288,6 +289,7 @@ app.post("/register-for-process",
                         res.redirect('/dashboard');
                         var emailOptions = {
                             from: process.env.MAIL_USER,
+                            replyTo: process.env.MAIL_USER,
                             to: newUserMetadata.email,
                             subject: 'Welcome to AirB&B',
                             html: '<p>Hello ' + newUserMetadata.fname + ' ' + newUserMetadata.lname + ',<br/><br/>Thank you for registering with us!<br/><br/><br/>Sincerely,<br/>Customer Support</p>'
@@ -448,7 +450,7 @@ app.post("/create-booking", checkLogin, (req, res) => {
                                 } else { 
                                     console.log("Success: " + info.response); 
                                 }
-                    })
+                    });
                 //update guest trip stat
                 userModel.updateOne(
                     { email: newBookingMetadata.guestID },

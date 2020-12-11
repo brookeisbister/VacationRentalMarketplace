@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-mongoose.Promise = require("bluebird");     //for asyncronous thread? to control promises?
+mongoose.Promise = require("bluebird"); 
 const bcrypt = require('bcryptjs');
 
 const UserSchema = new Schema({
