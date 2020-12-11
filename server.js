@@ -5,6 +5,7 @@ const path = require("path");
 const hbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
+const sgTransport = require('nodemailer-sendgrid-transport');
 const mongoose = require("mongoose");
 mongoose.Promise = require("bluebird");
 const clientsessions = require("client-sessions");
@@ -30,13 +31,19 @@ app.set('view engine', '.hbs');                 //Register handlebars as the ren
 app.use(bodyParser.urlencoded({ extended: true })); //middleware for “urlencoded” form data
 
 //email setup
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
+// var transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//         user: process.env.MAIL_USER,
+//         pass: process.env.MAIL_PASS
+//     }
+// });
+const transporter = nodemailer.createTransport(sgTransport({
     auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
+        api_key: process.env.SENDGRID_API_KEY // your api key here, better hide it in env vars
     }
-});
+}))
+
 
 //configure cookie method for storing session information
 app.use(clientsessions({
@@ -429,6 +436,7 @@ app.post("/create-booking", checkLogin, (req, res) => {
                         //send confirmation email
                         const emailOptions = {
                             from: process.env.MAIL_USER,
+                            replyTo: process.env.MAIL_USER,
                             to: newBookingMetadata.guestID,
                             subject: 'AirB&B Booking Confirmation',
                             html: `<p>Hello ${guest.fname} ${guest.lname},</p><p>Your reservation is confirmed. Thank you!</p><p><strong>Booking Details</strong></p><p style="padding-left: 40px;"><strong>Confirmation Code:</strong> ${booking._id}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-in:</strong> ${booking.startDate}</p><p style="text-align: left; padding-left: 40px;"><strong>Check-out:</strong> ${booking.endDate}</p><p style="padding-left: 40px;"><strong>Total:</strong> ${booking.totalPrice}</p><p>&nbsp;</p><p>Enjoy your stay,</p><p>Customer Support</p>`
